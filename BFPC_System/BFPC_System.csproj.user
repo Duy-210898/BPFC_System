@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PublishUrlHistory>D:\Audit System\|\\10.30.0.116\D\Sharedata\|\\10.30.4.106\D\Audit System\|\\10.30.0.252\aphfile\%40Public\New ME-Information Sharing\|\\10.30.0.116\\Audit System\</PublishUrlHistory>
+    <InstallUrlHistory>\\10.30.0.116\Sharedata\Audit System\|\\10.30.0.116\Sharedata\|http://10.30.0.116:8000/Sharedata/|http://localhost:8000/Sharedata/|\\10.30.0.116\D\Sharedata\</InstallUrlHistory>
+    <SupportUrlHistory />
+    <UpdateUrlHistory>\\10.30.0.116\Sharedata\|http://10.30.0.116:8000/Sharedata/|\\10.30.0.116\D\Sharedata\|\\10.30.4.106\D\Audit System\|http://10.30.0.116/Sharedata/</UpdateUrlHistory>
+    <BootstrapperUrlHistory />
+    <ErrorReportUrlHistory />
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
+  <PropertyGroup>
+    <EnableSecurityDebugging>false</EnableSecurityDebugging>
+  </PropertyGroup>
+</Project>
