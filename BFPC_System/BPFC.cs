@@ -22,9 +22,7 @@ namespace BPFC_System
 
             connectionString = ConfigurationManager.ConnectionStrings["strCon"].ConnectionString;
             DoubleBuffered = true;
-
             EnableDoubleBufferingForControls(this);
-
             DisplayArticleNames();
             StartPeriodicTask();
         }
@@ -46,10 +44,10 @@ namespace BPFC_System
                 if (itemCountAfter > itemCountBefore)
                 {
                     // Hiển thị thông báo chỉ trên frmBpfc
-                    MessageBox.Show(new frmBpfc(), "Có Article mới cần kiểm tra!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(frmBpfc.ActiveForm, "Có Article mới cần kiểm tra!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
-                await Task.Delay(60000);
+                await Task.Delay(2000);
             }
         }
 
@@ -140,7 +138,11 @@ namespace BPFC_System
             }
         }
 
-        // Xử lý sự kiện đăng xuất
+        /// <summary>
+        /// Xử lý sự kiện đăng xuất
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void lblLogOut_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("Bạn có chắc chắn muốn đăng xuất?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -153,6 +155,7 @@ namespace BPFC_System
 
             }
         }
+
         private void txtArticle_Leave(object sender, EventArgs e)
         { 
             btnCheckArticle_Click(sender, e);
@@ -191,7 +194,6 @@ namespace BPFC_System
             }
         }
 
-
         private void btnSave_Click(object sender, EventArgs e)
         {
             btnSave.Focus();
@@ -200,7 +202,7 @@ namespace BPFC_System
 
             if (createdByUserId == -1)
             {
-                MessageBox.Show("ID người dùng chưa được thiết lập.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowErrorMessage("ID người dùng chưa được thiết lập.");
                 return;
             }
 
@@ -208,7 +210,7 @@ namespace BPFC_System
 
             if (string.IsNullOrEmpty(article))
             {
-                MessageBox.Show("Vui lòng nhập Article!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowErrorMessage("Vui lòng nhập Article!");
                 txtArticle.Focus();
                 dbManager.HighlightTextBoxForShortDuration(txtArticle);
                 return;
@@ -216,78 +218,101 @@ namespace BPFC_System
 
             if (dbManager.ArticleExists(article))
             {
-                ArticleData data = GetArticleDataFromTextBoxes();
-
-                ArticleData currentData = dbManager.GetArticleData(article);
-
-                if (IsDataChanged(currentData, data))
-                {
-                    string username = lblUserCE.Text;
-
-                    string logMessage = $"Article '{data.ArticleName}' đã được chỉnh sửa thành công";
-
-                    dbManager.LogCEActivity(username, data.ArticleName, "Update", "CE");
-
-                    AppendLog(logMessage);
-
-                    dbManager.UpdateArticleData(article, data, createdByUserId);
-
-                    if (!checkboxMultiArticles.Checked)
-                    {
-                        ClearTextBoxes();
-                        txtArticle.Clear();
-                    }
-
-                    if (lvArticleToCreate.Items.Cast<ListViewItem>().Any(item => String.Equals(item.Text, article, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        // Nếu có item giống với article, thực hiện xóa
-                        dbManager.DeleteArticleToCreate(article);
-                        DisplayArticleNames();
-                    }
-
-                    MessageBox.Show("Dữ liệu đã được cập nhật thành công.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    DialogResult result = MessageBox.Show($"Không có sự thay đổi trong dữ liệu của Article {article}.\nĐóng chỉnh sửa dữ liệu?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                    if (result == DialogResult.Yes)
-                    {
-                        ClearTextBoxes();
-                        txtArticle.Clear();
-                    }
-                }
+                HandleExistingArticle(article, createdByUserId);
             }
             else
             {
-                ArticleData data = GetArticleDataFromTextBoxes();
-                dbManager.SaveArticleData(data, createdByUserId);
-
-                string username = lblUserCE.Text;
-
-                string logMessage = $"Article '{data.ArticleName}' đã được lưu thành công";
-
-                dbManager.LogCEActivity(username, data.ArticleName, "Create", "CE");
-
-                AppendLog(logMessage);
-
-                if (!checkboxMultiArticles.Checked)
-                {
-                    txtArticle.Clear();
-                    ClearTextBoxes();
-                }
-
-                if (lvArticleToCreate.Items.Cast<ListViewItem>().Any(item => String.Equals(item.Text, article, StringComparison.OrdinalIgnoreCase)))
-                {
-                    // Nếu có item giống với article, thực hiện xóa
-                    dbManager.DeleteArticleToCreate(article);
-                    DisplayArticleNames();
-                }
-
-                MessageBox.Show("Dữ liệu đã được lưu thành công.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                HandleNewArticle(article, createdByUserId);
             }
         }
-        // Kiểm tra xem dữ liệu có thay đổi hay không
+
+        private void HandleExistingArticle(string article, int createdByUserId)
+        {
+            DatabaseManager dbManager = new DatabaseManager(connectionString);
+
+            ArticleData data = GetArticleDataFromTextBoxes();
+            ArticleData currentData = dbManager.GetArticleData(article);
+
+            if (IsDataChanged(currentData, data))
+            {
+                string username = lblUserCE.Text;
+                string logMessage = $"Article '{data.ArticleName}' đã được chỉnh sửa thành công";
+
+                dbManager.LogCEActivity(username, data.ArticleName, "Update", "CE");
+                AppendLog(logMessage);
+                dbManager.UpdateArticleData(article, data, createdByUserId);
+
+                HandlePostAction(article);
+            }
+            else
+            {
+                ShowConfirmationDialogAndClearTextBoxes(article);
+            }
+        }
+
+        private void HandleNewArticle(string article, int createdByUserId)
+        {
+            DatabaseManager dbManager = new DatabaseManager(connectionString);
+
+            ArticleData data = GetArticleDataFromTextBoxes();
+            dbManager.SaveArticleData(data, createdByUserId);
+
+            string username = lblUserCE.Text;
+            string logMessage = $"Article '{data.ArticleName}' đã được lưu thành công";
+
+            dbManager.LogCEActivity(username, data.ArticleName, "Create", "CE");
+            AppendLog(logMessage);
+
+            HandlePostAction(article);
+        }
+
+        private void HandlePostAction(string article)
+        {
+            DatabaseManager dbManager = new DatabaseManager(connectionString);
+
+            if (!checkboxMultiArticles.Checked)
+            {
+                ClearTextBoxes();
+                txtArticle.Clear();
+            }
+
+            if (lvArticleToCreate.Items.Cast<ListViewItem>().Any(item => String.Equals(item.Text, article, StringComparison.OrdinalIgnoreCase)))
+            {
+                // Nếu có item giống với article, thực hiện xóa
+                dbManager.DeleteArticleToCreate(article);
+                DisplayArticleNames();
+            }
+
+            ShowSuccessMessage("Dữ liệu đã được cập nhật thành công.");
+        } 
+
+        private void ShowErrorMessage(string message)
+        {
+            MessageBox.Show(message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void ShowConfirmationDialogAndClearTextBoxes(string article)
+        {
+            DialogResult result = MessageBox.Show($"Không có sự thay đổi trong dữ liệu của Article {article}.\nĐóng chỉnh sửa dữ liệu?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                ClearTextBoxes();
+                txtArticle.Clear();
+            }
+        }
+
+        private void ShowSuccessMessage(string message)
+        {
+            MessageBox.Show(message, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        /// <summary>
+        /// Kiểm tra xem dữ liệu có thay đổi hay không
+        /// </summary>
+        /// <param name="currentData"></param>
+        /// <param name="newData"></param>
+        /// <returns></returns>
         private bool IsDataChanged(ArticleData currentData, ArticleData newData)
         {
             if (currentData == null && newData == null)
@@ -350,7 +375,10 @@ namespace BPFC_System
             }
         }
 
-        // Hiển thị thông tin Article lên giao diện
+        /// <summary>
+        /// Hiển thị thông tin Article lên giao diện
+        /// </summary>
+        /// <param name="articleData"></param>
         private void DisplayArticleData(ArticleData articleData)
         {
             lblCreatedAt.Text = $"Thời gian tạo: {articleData.CreatedAt.ToString()}";
@@ -380,7 +408,10 @@ namespace BPFC_System
             txtChemical3Outsole.Text = articleData.Chemical3Outsole;
         }
 
-        // Lấy dữ liệu từ các TextBox vào đối tượng ArticleData
+        /// <summary>
+        /// Lấy dữ liệu từ các TextBox vào đối tượng ArticleData
+        /// </summary>
+        /// <returns></returns>
         private ArticleData GetArticleDataFromTextBoxes()
         {
             return new ArticleData
@@ -408,7 +439,10 @@ namespace BPFC_System
             };
         }
 
-        // Ghi log và hiển thị lên giao diện
+        /// <summary>
+        /// Ghi log và hiển thị lên giao diện
+        /// </summary>
+        /// <param name="logMessage"></param>
         private void AppendLog(string logMessage)
         {
             string logEntry = $"{logMessage}";
@@ -424,7 +458,6 @@ namespace BPFC_System
             lastLogTime = DateTime.Now;
         }
 
-
         private float? ParseTemperatureTextBoxValue(string textBoxText)
         {
             // Tách giá trị nhiệt độ từ chuỗi (loại bỏ " ±5" và khoảng trắng nếu có)
@@ -434,7 +467,6 @@ namespace BPFC_System
             {
                 string temperatureText = parts[0].Replace(" ", "").Trim();
 
-                // Thử chuyển đổi giá trị thành số thực
                 if (float.TryParse(temperatureText, out float temperature))
                 {
                     return temperature;
@@ -444,7 +476,10 @@ namespace BPFC_System
             return null;
         }
 
-        // Lấy ID người dùng hiện tại
+        /// <summary>
+        /// Lấy ID người dùng hiện tại
+        /// </summary>
+        /// <returns></returns>
         private int GetCurrentUserId()
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -472,7 +507,9 @@ namespace BPFC_System
             return username;
         }
 
-        // Xóa nội dung các TextBox
+        /// <summary>
+        /// Xóa nội dung các TextBox
+        /// </summary>
         private void ClearTextBoxes()
         {
             txtModel.Clear();
@@ -498,43 +535,11 @@ namespace BPFC_System
             lblCreatedBy.Text = "";
         }
 
-        // Xóa các dòng log cũ hơn 12 giờ
-        private void timerDeleteLog_Tick(object sender, EventArgs e)
-        {
-            for (int i = txtLog.Lines.Length - 1; i >= 0; i--)
-            {
-                string logLine = txtLog.Lines[i];
-                string[] parts = logLine.Split(new string[] { " - " }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (parts.Length >= 2)
-                {
-                    if (DateTime.TryParseExact(parts[0], "dd/MM/yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out DateTime logDateTime))
-                    {
-                        TimeSpan timeElapsed = DateTime.Now - logDateTime;
-
-                        if (timeElapsed.TotalHours >= 12)
-                        {
-                            RemoveLogLine(i);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Xóa một dòng log
-        private void RemoveLogLine(int lineIndex)
-        {
-            string[] lines = txtLog.Lines;
-            List<string> updatedLines = new List<string>(lines);
-
-            if (lineIndex >= 0 && lineIndex < lines.Length)
-            {
-                updatedLines.RemoveAt(lineIndex);
-                txtLog.Lines = updatedLines.ToArray();
-            }
-        }
-
-        // Xóa nội dung các TextBox khi thay đổi giá trị của TextBox Article
+        /// <summary>
+        /// Xóa nội dung các TextBox khi thay đổi giá trị của TextBox Article
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void txtArticle_TextChanged(object sender, EventArgs e)
         {
             TextBox textBox = (TextBox)sender;
@@ -572,7 +577,6 @@ namespace BPFC_System
                 }
             }
         }
-
 
         public class ArticleData
         {
@@ -640,6 +644,7 @@ namespace BPFC_System
                 textBox.Text += " ±5";
             }
         }
+
         private void TextBox_Enter(object sender, EventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -680,7 +685,7 @@ namespace BPFC_System
 
         private void frmBpfc_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Application.Exit();
+            System.Windows.Forms.Application.Exit();
         }
 
         private void txtModel_TextChanged(object sender, EventArgs e)

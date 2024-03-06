@@ -770,6 +770,12 @@ namespace BPFC_System
 
             // Hiển thị kết quả lên txtActivityLog
             txtActivityLog.Text = activityLog.ToString();
+
+            // Di chuyển con trỏ văn bản đến cuối chuỗi
+            txtActivityLog.SelectionStart = txtActivityLog.Text.Length;
+
+            // Đảm bảo dòng cuối cùng được hiển thị bằng cách cuộn đến con trỏ
+            txtActivityLog.ScrollToCaret();
         }
 
         private string DetermineOverallResult(params TextBox[] resultTextBoxes)

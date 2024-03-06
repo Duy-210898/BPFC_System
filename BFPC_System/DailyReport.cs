@@ -126,6 +126,7 @@ namespace BFPC_System
 
         private void SetupDgvLineDetail()
         {
+            dgvLineDetail.RowHeadersVisible = false;
             // Kiểm tra xem có dữ liệu và các cột có giá trị không null
             if (dgvLineDetail.Rows.Count > 0 && dgvLineDetail.Columns.Count > 0)
             {
@@ -193,27 +194,22 @@ namespace BFPC_System
             {
                 string selectedPlantName = cbxPlantNames.SelectedItem.ToString().Substring(6);
 
-                // Get the list of LineID for the selected plant
                 List<int> selectedLineIDs = dbManager.GetProductionLineIDs(selectedPlantName);
 
                 if (selectedLineIDs.Count > 0)
                 {
                     DateTime selectedDate = dtpReportDate.Value.Date;
 
-                    // Get all LineNames for the selected plant
                     List<string> allLineNames = dbManager.GetProductionLines(selectedPlantName);
 
-                    // Create a new DataTable
                     DataTable dataTable = new DataTable();
 
-                    // Add columns to the DataTable
                     dataTable.Columns.Add("LineName", typeof(string));
                     dataTable.Columns.Add("FinalTimeResult", typeof(string));
                     dataTable.Columns.Add("FinalTempResult", typeof(string));
                     dataTable.Columns.Add("FinalChemicalResult", typeof(string));
                     dataTable.Columns.Add("LineResult", typeof(string));
 
-                    // Fill in LineNames
                     foreach (string lineName in allLineNames)
                     {
                         DataRow newRow = dataTable.NewRow();
@@ -221,7 +217,6 @@ namespace BFPC_System
                         dataTable.Rows.Add(newRow);
                     }
 
-                    // Iterate through the query results to fill in data
                     var query = dbContext.GetResults(selectedDate)
                         .Where(result => selectedLineIDs.Contains(result.LineID))
                         .ToList();
@@ -236,10 +231,10 @@ namespace BFPC_System
                         row["LineResult"] = CompareFinalResultsByLineName(query, lineName);
                     }
 
-                    // Set the DataTable as the DataSource for the DataGridView
                     dgvDailyReport.DataSource = dataTable;
 
-                    // Optionally, customize the DataGridView appearance
+                    dgvDailyReport.RowHeadersVisible = false;
+
                     dgvDailyReport.Columns["LineName"].HeaderText = "Line";
                     dgvDailyReport.Columns["FinalTimeResult"].HeaderText = "Thời gian";
                     dgvDailyReport.Columns["FinalTempResult"].HeaderText = "Nhiệt độ";

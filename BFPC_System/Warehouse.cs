@@ -40,6 +40,10 @@ namespace BPFC_System
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer, true);
         }
 
+
+        /// <summary>
+        /// Ánh xạ Watermark tương ứng vs các Textbox
+        /// </summary>
         private void InitializeWatermarkMappings()
         {
             actualToStdTextBoxMap.Add(txtActualChemical1Outsole, txtStdChemical1Outsole);
@@ -50,6 +54,10 @@ namespace BPFC_System
             actualToStdTextBoxMap.Add(txtActualChemical3Upper, txtStdChemical3Upper);
         }
 
+        /// <summary>
+        /// Giảm flickering
+        /// </summary>
+        /// <param name="parentControl"></param>
         private void EnableDoubleBufferingForControls(Control parentControl)
         {
             foreach (Control control in parentControl.Controls)
@@ -65,6 +73,11 @@ namespace BPFC_System
                 }
             }
         }
+
+        /// <summary>
+        /// Kiểm tra null cho các textbox
+        /// </summary>
+        /// <returns></returns>
         private bool IsAnyResultTextBoxNull()
         {
             if (string.IsNullOrEmpty(txtResultChemical1Upper.Text) ||
@@ -79,6 +92,10 @@ namespace BPFC_System
 
             return false;
         }
+
+        /// <summary>
+        /// Tô màu cho các textbox
+        /// </summary>
         private void ColorizeTextBoxes()
         {
             foreach (Control control in tableLayoutPanel1.Controls)
@@ -104,13 +121,22 @@ namespace BPFC_System
             }
         }
 
-
+        /// <summary>
+        /// Đọc dữ liệu từ cơ sở dữ liệu
+        /// </summary>
+        /// <param name="lineName"></param>
+        /// <param name="selectedDate"></param>
         private void LoadDataFromDatabase(string lineName, DateTime selectedDate)
         {
             List<ResultViewModel> results = dbContext.GetAtucaChemicalForLineAndDate(lineName, selectedDate);
             DisplayData(results);
         }
 
+
+        /// <summary>
+        /// Hiển thị dữ liệu kết quả lên các textbox tương ứng khi Togle được bật (Trường hợp cần xem dữ liệu của ngày hôm trước)
+        /// </summary>
+        /// <param name="results"></param>
         private void DisplayData(List<ResultViewModel> results)
         {
             if (results.Count > 0)
@@ -130,6 +156,12 @@ namespace BPFC_System
             }
         }
 
+
+        /// <summary>
+        /// Hiển thị dữ liệu kết quả lên các text box tương ứng
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="partName"></param>
         private void DisplayResultData(ResultViewModel result, string partName)
         {
             if (result != null)
@@ -175,6 +207,11 @@ namespace BPFC_System
             }
         }
 
+        /// <summary>
+        /// Hiển thị dữ liệu thực tế lên các textbox tương ứng
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="partName"></param>
         private void DisplayActualData(ResultViewModel result, string partName)
         {
             if (result != null)
@@ -228,8 +265,11 @@ namespace BPFC_System
             }
         }
 
-
-        // Phương thức btnSave_Click trong form
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnSave_Click(object sender, EventArgs e)
         {
             btnSave.Focus();
@@ -238,6 +278,7 @@ namespace BPFC_System
 
             bool articleExists = dbManager.ArticleExists(articleName);
 
+            //  Khi có textbox Result nào null thì sẽ thực hiện các lệnh tương ứng
             if (IsAnyResultTextBoxNull())
             {
                 if (articleExists)
@@ -250,6 +291,7 @@ namespace BPFC_System
                     txtActualChemical3Outsole_Leave(txtActualChemical3Outsole, EventArgs.Empty);
                 }
             }
+            // txtArticle null
             if (string.IsNullOrEmpty(articleName))
             {
                 MessageBox.Show("Chưa có Article!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -412,6 +454,11 @@ namespace BPFC_System
             }
         }
 
+        /// <summary>
+        /// Hiển thị các dòng nhật kí lên giao diện người dùng
+        /// </summary>
+        /// <param name="department"></param>
+        /// <param name="timestamp"></param>
         private void DisplayActivity(string department, DateTime timestamp)
         {
             DatabaseManager dbManager = new DatabaseManager(connectionString);
@@ -442,15 +489,20 @@ namespace BPFC_System
                 activityLog.AppendLine();
             }
 
+
             // Hiển thị kết quả lên txtActivityLog
             txtActivityLog.Text = activityLog.ToString();
+
+            // Di chuyển con trỏ văn bản đến cuối chuỗi
+            txtActivityLog.SelectionStart = txtActivityLog.Text.Length;
+            // Đảm bảo dòng cuối cùng được hiển thị bằng cách cuộn đến con trỏ
+            txtActivityLog.ScrollToCaret();
         }
 
 
 
         private string DetermineOverallResult(params TextBox[] resultTextBoxes)
         {
-            // Check if any of the result TextBoxes contain "FAIL"
             foreach (var textBox in resultTextBoxes)
             {
                 if (textBox.Text == "FAIL")
@@ -467,7 +519,6 @@ namespace BPFC_System
                 }
             }
 
-            // If no "FAIL" and at least one "PASS" or all are null/empty, return "PASS"
             return "PASS";
         }
         private void lblLogOut_MouseEnter(object sender, EventArgs e)

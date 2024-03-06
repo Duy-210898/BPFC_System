@@ -105,6 +105,7 @@ namespace BFPC_System
             dgvReport.EnableHeadersVisualStyles = false;
             dgvReport.RowHeadersDefaultCellStyle.BackColor = System.Drawing.Color.White;
             dgvReport.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing; 
+            dgvReport.RowHeadersVisible = false;
         }
 
         private void LoadMenu()
