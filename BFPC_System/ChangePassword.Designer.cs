@@ -54,9 +54,9 @@
             this.panel2.Controls.Add(this.txtOldPassword);
             this.panel2.Controls.Add(this.txtUsername);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(177, 0);
+            this.panel2.Location = new System.Drawing.Point(169, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(274, 230);
+            this.panel2.Size = new System.Drawing.Size(282, 230);
             this.panel2.TabIndex = 3;
             this.panel2.TabStop = true;
             // 
@@ -72,7 +72,7 @@
             this.btnChangePassword.LookAndFeel.SkinName = "Glass Oceans";
             this.btnChangePassword.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnChangePassword.Name = "btnChangePassword";
-            this.btnChangePassword.Size = new System.Drawing.Size(119, 35);
+            this.btnChangePassword.Size = new System.Drawing.Size(111, 35);
             this.btnChangePassword.TabIndex = 6;
             this.btnChangePassword.TabStop = false;
             this.btnChangePassword.Text = "Đổi mật khẩu";
@@ -83,7 +83,7 @@
             this.txtConfirmPassword.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtConfirmPassword.Location = new System.Drawing.Point(17, 138);
             this.txtConfirmPassword.Name = "txtConfirmPassword";
-            this.txtConfirmPassword.Size = new System.Drawing.Size(215, 26);
+            this.txtConfirmPassword.Size = new System.Drawing.Size(207, 26);
             this.txtConfirmPassword.TabIndex = 4;
             // 
             // txtNewPassword
@@ -91,7 +91,7 @@
             this.txtNewPassword.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtNewPassword.Location = new System.Drawing.Point(17, 100);
             this.txtNewPassword.Name = "txtNewPassword";
-            this.txtNewPassword.Size = new System.Drawing.Size(215, 26);
+            this.txtNewPassword.Size = new System.Drawing.Size(207, 26);
             this.txtNewPassword.TabIndex = 3;
             // 
             // txtOldPassword
@@ -99,7 +99,7 @@
             this.txtOldPassword.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtOldPassword.Location = new System.Drawing.Point(17, 62);
             this.txtOldPassword.Name = "txtOldPassword";
-            this.txtOldPassword.Size = new System.Drawing.Size(215, 26);
+            this.txtOldPassword.Size = new System.Drawing.Size(207, 26);
             this.txtOldPassword.TabIndex = 2;
             // 
             // txtUsername
@@ -107,7 +107,7 @@
             this.txtUsername.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtUsername.Location = new System.Drawing.Point(17, 24);
             this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(215, 26);
+            this.txtUsername.Size = new System.Drawing.Size(207, 26);
             this.txtUsername.TabIndex = 1;
             // 
             // label4
@@ -117,9 +117,9 @@
             this.label4.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.label4.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.label4.Location = new System.Drawing.Point(34, 136);
+            this.label4.Location = new System.Drawing.Point(26, 136);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(124, 26);
+            this.label4.Size = new System.Drawing.Size(116, 26);
             this.label4.TabIndex = 0;
             this.label4.Text = "Xác nhận:";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -131,9 +131,9 @@
             this.label3.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.label3.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.label3.Location = new System.Drawing.Point(33, 98);
+            this.label3.Location = new System.Drawing.Point(25, 98);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(124, 26);
+            this.label3.Size = new System.Drawing.Size(116, 26);
             this.label3.TabIndex = 0;
             this.label3.Text = "Mật khẩu mới:";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -145,9 +145,9 @@
             this.label2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.label2.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.label2.Location = new System.Drawing.Point(33, 62);
+            this.label2.Location = new System.Drawing.Point(25, 62);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(124, 26);
+            this.label2.Size = new System.Drawing.Size(116, 26);
             this.label2.TabIndex = 0;
             this.label2.Text = "Mật khẩu cũ:";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -159,9 +159,9 @@
             this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.label1.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.label1.Location = new System.Drawing.Point(33, 22);
+            this.label1.Location = new System.Drawing.Point(25, 22);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(124, 26);
+            this.label1.Size = new System.Drawing.Size(116, 26);
             this.label1.TabIndex = 0;
             this.label1.Text = "Tên tài khoản:";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -177,7 +177,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(177, 230);
+            this.panel1.Size = new System.Drawing.Size(169, 230);
             this.panel1.TabIndex = 2;
             // 
             // frmChangePassword

@@ -63,31 +63,35 @@ namespace BPFC_System
                 return;
             }
 
-
-            // Xác minh người dùng và kiểm tra tình trạng tài khoản
-            bool isUserValid = dbManager.ValidateUser(username, password);
+            // Kiểm tra tài khoản có kích hoạt không
             bool isActive = dbManager.IsActive(username);
 
-            if (isUserValid && isActive)
+            if(!isActive)
+            {
+                // Hiển thị thông báo lỗi nếu tài khoản đã bị vô hiệu hóa
+                MessageBox.Show("Tài khoản đã bị vô hiệu hóa!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtPassword.Clear();
+                txtPassword.Focus();
+                return;
+            }
+
+            // Kiểm tra tình trạng tài khoản
+            bool isUserValid = dbManager.ValidateUser(username, password);
+
+            if (isUserValid)
             {
                 // Xóa mật khẩu và ẩn form đăng nhập
                 txtPassword.Clear();
                 this.Hide();
                 int userId = dbManager.GetUserIdByUsername(username);
+
                 // Mở form tương ứng dựa trên bộ phận
                 dbManager.OpenCorrespondingForm(username);
             }
-            else if (!isUserValid)
+            else
             {
                 // Hiển thị thông báo lỗi nếu mật khẩu sai
                 MessageBox.Show("Mật khẩu sai!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtPassword.Clear();
-                txtPassword.Focus();
-            }
-            else if (!isActive)
-            {
-                // Hiển thị thông báo lỗi nếu tài khoản đã bị vô hiệu hóa
-                MessageBox.Show("Tài khoản đã bị vô hiệu hóa!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtPassword.Clear();
                 txtPassword.Focus();
             }

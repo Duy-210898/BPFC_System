@@ -14,6 +14,7 @@ using System.Linq;
 using System.Data.Entity;
 using System.Text;
 using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.ExtendedProperties;
 
 namespace BPFC_System
 {
@@ -23,17 +24,19 @@ namespace BPFC_System
         private DateTime lastLogTime = DateTime.Now;
         private Dictionary<TextBox, TextBox> actualToStdTextBoxMap = new Dictionary<TextBox, TextBox>();
         BpfcDbContext dbContext = new BpfcDbContext();
+        private DatabaseManager dbManager;
 
         public frmWarehouse()
         {
             InitializeComponent();
-            connectionString = ConfigurationManager.ConnectionStrings["strCon"].ConnectionString;
             DoubleBuffered = true;
             InitializeWatermarkMappings();
             RegisterWatermarkEvents();
             dtpDate.MaxDate = DateTime.Now;
             dtpDate.Value = DateTime.Now;
 
+            connectionString = ConfigurationManager.ConnectionStrings["strCon"].ConnectionString;
+            dbManager = new DatabaseManager(connectionString);
             EnableDoubleBufferingForControls(this);
 
             LookAndFeel.UseWindowsXPTheme = true;
@@ -276,160 +279,86 @@ namespace BPFC_System
             string articleName = txtArticle.Text.Trim();
             DatabaseManager dbManager = new DatabaseManager(connectionString);
 
-            bool articleExists = dbManager.ArticleExists(articleName);
-
-            //  Khi có textbox Result nào null thì sẽ thực hiện các lệnh tương ứng
-            if (IsAnyResultTextBoxNull())
-            {
-                if (articleExists)
-                {
-                    txtActualChemical1Upper_Leave(txtActualChemical1Upper, EventArgs.Empty);
-                    txtActualChemical1Outsole_Leave(txtActualChemical1Outsole, EventArgs.Empty);
-                    txtActualChemical2Upper_Leave(txtActualChemical2Upper, EventArgs.Empty);
-                    txtActualChemical2Outsole_Leave(txtActualChemical2Outsole, EventArgs.Empty);
-                    txtActualChemical3Upper_Leave(txtActualChemical3Upper, EventArgs.Empty);
-                    txtActualChemical3Outsole_Leave(txtActualChemical3Outsole, EventArgs.Empty);
-                }
-            }
-            // txtArticle null
             if (string.IsNullOrEmpty(articleName))
             {
                 MessageBox.Show("Chưa có Article!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            string[] emptyActualTextBoxes = GetEmptyActualTextBoxes();
-            if (emptyActualTextBoxes.Length > 0)
-            {
-                string textBoxNames = string.Join("\n", emptyActualTextBoxes);
-                DialogResult result = MessageBox.Show($"Giá trị thực tế ở ô {textBoxNames} chưa được nhập.\nĐiều này sẽ dẫn đến Kết quả FAIL.\nBạn có chắc chắn bỏ qua không?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-                if (result == DialogResult.No)
-                {
-                    return;
-                }
+            if (IsAnyResultTextBoxNull() && dbManager.ArticleExists(articleName))
+            {
+                TriggerLeaveEventsForActualTextBoxes();
+            }
+
+            if (CheckAndConfirmEmptyActualTextBoxes())
+            {
+                return;
             }
 
             string lineName = cbxLines.SelectedItem.ToString();
             DateTime selectedDate = dtpDate.Value.Date;
-
             string username = lblUserWH.Text;
-
-            var partIds = dbManager.GetArticlePartIDs(articleName);
             int lineId = dbManager.GetLineID(lineName);
+            var partIds = dbManager.GetArticlePartIDs(articleName);
+            var chemicalResults = GetChemicalResults();
 
-            // Kiểm tra xem đã đạt giới hạn 2 dòng dữ liệu cho LineID trong ngày chưa
-            bool hasReachedLimit = dbManager.HasReachedDataLimitForChemicalresults(lineId, selectedDate);
-
-            if (hasReachedLimit)
+            if (dbManager.HasReachedDataLimitForChemicalresults(lineId, selectedDate))
             {
-                DialogResult replaceResult = MessageBox.Show($"Đã có dữ liệu cho {lineName} vào ngày {selectedDate.ToString("dddd, dd/MM/yyyy")}. Bạn có muốn thay đổi không?", "Thay đổi dữ liệu", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                if (replaceResult == DialogResult.Yes)
+                if (MessageBox.Show($"Đã có dữ liệu cho {lineName} vào ngày {selectedDate:dddd, dd/MM/yyyy}. Bạn có muốn thay đổi không?", "Thay đổi dữ liệu", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    // Tiến hành cập nhật dữ liệu
-                    Dictionary<string, string[]> chemicalResults = new Dictionary<string, string[]>
-            {
-                {
-                    "Outsole",
-                    new string[]
-                    {
-                        txtActualChemical1Outsole.Text, txtResultChemical1Outsole.Text,
-                        txtActualChemical2Outsole.Text, txtResultChemical2Outsole.Text,
-                        txtActualChemical3Outsole.Text, txtResultChemical3Outsole.Text
-                    }
-                },
-                {
-                    "Upper",
-                    new string[]
-                    {
-                        txtActualChemical1Upper.Text, txtResultChemical1Upper.Text,
-                        txtActualChemical2Upper.Text, txtResultChemical2Upper.Text,
-                        txtActualChemical3Upper.Text, txtResultChemical3Upper.Text
-                    }
-                }
-            };
-
-                    // Gọi phương thức UpdateChemicalResults để cập nhật dữ liệu
                     dbManager.UpdateChemicalResults(lineId, partIds, chemicalResults, selectedDate);
-
-                    string department = "Warehouse";
-
-                    string reportDate = selectedDate.ToString("dd-MM-yyyy");
-
-                    string result = DetermineOverallResult(
-                        txtResultChemical1Outsole, txtResultChemical2Outsole, txtResultChemical3Outsole,
-                        txtResultChemical1Upper, txtResultChemical2Upper, txtResultChemical3Upper
-                    );
-
-                    dbManager.LogArticleActivity(username, reportDate, lineName, articleName, result, "Update", department, selectedDate);
-
-                    DisplayActivity(department, DateTime.Now);
-
+                    LogActivity("Update", username, selectedDate, lineName, articleName, "Warehouse");
                     MessageBox.Show($"Dữ liệu {lineName} đã được cập nhật thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             else
-
             {
-                string actualChemical1Outsole = txtActualChemical1Outsole.Text;
-                string result1Outsole = txtResultChemical1Outsole.Text;
-                string actualChemical2Outsole = txtActualChemical2Outsole.Text;
-                string result2Outsole = txtResultChemical2Outsole.Text;
-                string actualChemical3Outsole = txtActualChemical3Outsole.Text;
-                string result3Outsole = txtResultChemical3Outsole.Text;
-
-                string actualChemical1Upper = txtActualChemical1Upper.Text;
-                string result1Upper = txtResultChemical1Upper.Text;
-                string actualChemical2Upper = txtActualChemical2Upper.Text;
-                string result2Upper = txtResultChemical2Upper.Text;
-                string actualChemical3Upper = txtActualChemical3Upper.Text;
-                string result3Upper = txtResultChemical3Upper.Text;
-
-                Dictionary<string, string[]> chemicalResults = new Dictionary<string, string[]>
-            {
-                {
-                    "Outsole",
-                    new string[]
-                    {
-                        actualChemical1Outsole, result1Outsole,
-                        actualChemical2Outsole, result2Outsole,
-                        actualChemical3Outsole, result3Outsole
-                    }
-                },
-
-                {
-                    "Upper",
-                    new string[]
-                    {
-                        actualChemical1Upper, result1Upper,
-                        actualChemical2Upper, result2Upper,
-                        actualChemical3Upper, result3Upper
-                    }
-                }
-            };
-
-                // Gọi phương thức SaveChemicalResults để lưu dữ liệu vào cơ sở dữ liệu
                 dbManager.SaveChemicalResults(lineId, partIds, chemicalResults, selectedDate);
-
-                string department = "Warehouse";
-
-                string reportDate = selectedDate.ToString("dd-MM-yyyy");
-                // Ghi log hoạt động và thêm tên bài viết vào dòng sản xuất (line)
-                string result = DetermineOverallResult(
-                    txtResultChemical1Outsole, txtResultChemical2Outsole, txtResultChemical3Outsole,
-                    txtResultChemical1Upper, txtResultChemical2Upper, txtResultChemical3Upper
-                );
-
-                dbManager.LogArticleActivity(username, reportDate, lineName, articleName, result, "Insert", department, selectedDate);
-
-                DisplayActivity(department, DateTime.Now);
-
+                LogActivity("Insert", username, selectedDate, lineName, articleName, "Warehouse");
                 MessageBox.Show("Dữ liệu đã được lưu thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
             ClearTextBoxes();
-            int selectedIndex = cbxLines.SelectedIndex;
+            MoveToNextLineOrPlant(selectedDate);
+        }
 
+        private Dictionary<string, string[]> GetChemicalResults()
+        {
+            return new Dictionary<string, string[]>
+    {
+        {
+            "Outsole", new string[]
+            {
+                txtActualChemical1Outsole.Text, txtStdChemical1Outsole.Text, txtResultChemical1Outsole.Text,
+                txtActualChemical2Outsole.Text, txtStdChemical2Outsole.Text, txtResultChemical2Outsole.Text,
+                txtActualChemical3Outsole.Text, txtStdChemical3Outsole.Text, txtResultChemical3Outsole.Text
+            }
+        },
+        {
+            "Upper", new string[]
+            {
+                txtActualChemical1Upper.Text, txtStdChemical1Upper.Text, txtResultChemical1Upper.Text,
+                txtActualChemical2Upper.Text, txtStdChemical2Upper.Text, txtResultChemical2Upper.Text,
+                txtActualChemical3Upper.Text, txtStdChemical3Upper.Text, txtResultChemical3Upper.Text
+            }
+        }
+    };
+        }
+
+        private void LogActivity(string action, string username, DateTime selectedDate, string lineName, string articleName, string department)
+        {
+            string reportDate = selectedDate.ToString("dd-MM-yyyy");
+            string result = DetermineOverallResult(
+                txtResultChemical1Outsole, txtResultChemical2Outsole, txtResultChemical3Outsole,
+                txtResultChemical1Upper, txtResultChemical2Upper, txtResultChemical3Upper
+            );
+            dbManager.LogArticleActivity(username, reportDate, lineName, articleName, result, action, department, selectedDate);
+            DisplayActivity(department, DateTime.Now);
+        }
+
+        private void MoveToNextLineOrPlant(DateTime selectedDate)
+        {
+            int selectedIndex = cbxLines.SelectedIndex;
             if (selectedIndex < cbxLines.Items.Count - 1)
             {
                 cbxLines.SelectedIndex = selectedIndex + 1;
@@ -437,21 +366,37 @@ namespace BPFC_System
             else
             {
                 string plantName = cbxPlant.Text;
-                string formattedDate = selectedDate.ToString("dd-MM-yyyy"); 
-
+                string formattedDate = selectedDate.ToString("dd-MM-yyyy");
                 cbxLines.SelectedIndex = -1;
-
                 MessageBox.Show($"Đã nhập thông tin cho tất cả các chuyền của {plantName} trong ngày {formattedDate}!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                int selectedPlantIndex = cbxPlant.SelectedIndex;
-
-                cbxLines.Focus();
-
-                if (selectedPlantIndex < cbxPlant.Items.Count - 1)
+                if (cbxPlant.SelectedIndex < cbxPlant.Items.Count - 1)
                 {
-                    cbxPlant.SelectedIndex = selectedPlantIndex + 1;
+                    cbxPlant.SelectedIndex += 1;
                 }
+                cbxLines.Focus();
             }
+        }
+
+        private void TriggerLeaveEventsForActualTextBoxes()
+        {
+            txtActualChemical1Upper_Leave(txtActualChemical1Upper, EventArgs.Empty);
+            txtActualChemical1Outsole_Leave(txtActualChemical1Outsole, EventArgs.Empty);
+            txtActualChemical2Upper_Leave(txtActualChemical2Upper, EventArgs.Empty);
+            txtActualChemical2Outsole_Leave(txtActualChemical2Outsole, EventArgs.Empty);
+            txtActualChemical3Upper_Leave(txtActualChemical3Upper, EventArgs.Empty);
+            txtActualChemical3Outsole_Leave(txtActualChemical3Outsole, EventArgs.Empty);
+        }
+
+        private bool CheckAndConfirmEmptyActualTextBoxes()
+        {
+            string[] emptyActualTextBoxes = GetEmptyActualTextBoxes();
+            if (emptyActualTextBoxes.Length > 0)
+            {
+                string textBoxNames = string.Join("\n", emptyActualTextBoxes);
+                DialogResult result = MessageBox.Show($"Giá trị thực tế ở ô {textBoxNames} chưa được nhập.\nĐiều này sẽ dẫn đến Kết quả FAIL.\nBạn có chắc chắn bỏ qua không?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                return result == DialogResult.No;
+            }
+            return false;
         }
 
         /// <summary>
@@ -722,55 +667,40 @@ namespace BPFC_System
             DisplayActivity(department, DateTime.Now);
 
             cbxPlant.Focus();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+
+            List<string> plantNames = dbManager.GetPlantNames();
+            foreach (var plantName in plantNames)
             {
-                connection.Open();
-                SqlCommand command = new SqlCommand("SELECT PlantName FROM Plant", connection);
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    string plantName = reader["PlantName"].ToString();
-                    cbxPlant.Items.Add("Xưởng " + plantName);
-                }
-
-                reader.Close();
+                cbxPlant.Items.Add("Xưởng " + plantName);
             }
+
             lblUserWH.Text = Globals.Username;
         }
-
         private void cbxPlant_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbxPlant.SelectedItem != null)
             {
                 string selectedPlant = cbxPlant.SelectedItem.ToString().Substring(6);
 
-                cbxLines.Items.Clear();
-
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                if (!string.IsNullOrEmpty(selectedPlant))
                 {
-                    connection.Open();
-                    SqlCommand command = new SqlCommand("SELECT LineName FROM ProductionLines WHERE PlantID IN (SELECT PlantID FROM Plant WHERE PlantName = @SelectedPlant)", connection);
-                    command.Parameters.AddWithValue("@SelectedPlant", selectedPlant);
+                    string plantName = selectedPlant.Replace("XƯỞNG ", "");
 
-                    SqlDataReader reader = command.ExecuteReader();
+                    List<string> lines = dbManager.LoadProductionLines(plantName);
 
-                    while (reader.Read())
+                    if (lines.Count > 0)
                     {
-                        string lineName = reader["LineName"].ToString();
-                        cbxLines.Items.Add(lineName);
+                        cbxLines.DataSource = lines;
+                     //   dbManager.SortProductionLines(cbxLines);
                     }
-
-                    reader.Close();
+                    else
+                    {
+                        MessageBox.Show("Không có Chuyền tương ứng với xưởng này.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
                 ClearTextBoxes();
-                if (cbxLines.Items.Count > 0)
-                {
-                    cbxLines.SelectedIndex = -1;
-                }    
             }
         }
-
         protected override CreateParams CreateParams
         {
             get
@@ -922,6 +852,7 @@ namespace BPFC_System
             txtStdChemical2Outsole.Text = articleData.Chemical2Outsole;
             txtStdChemical3Outsole.Text = articleData.Chemical3Outsole;
         }
+
         private void cbxLines_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Lấy LineName được chọn trong cbxLines
@@ -1031,7 +962,7 @@ namespace BPFC_System
 
         private void frmWarehouse_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Application.Exit();
+            System.Windows.Forms.Application.Exit();
         }
 
         private void dtpDate_ValueChanged(object sender, EventArgs e)

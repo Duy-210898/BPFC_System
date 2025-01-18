@@ -63,16 +63,6 @@ namespace BFPC_System.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _3d9f16c3b9a9db92d33f9fc86d3607cd {
-            get {
-                object obj = ResourceManager.GetObject("3d9f16c3b9a9db92d33f9fc86d3607cd", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap _4_Ways_Shape_Operational_Excellence_blog_main {
             get {
                 object obj = ResourceManager.GetObject("4_Ways_Shape_Operational_Excellence_blog_main", resourceCulture);
@@ -86,16 +76,6 @@ namespace BFPC_System.Properties {
         internal static System.Drawing.Bitmap AddUser {
             get {
                 object obj = ResourceManager.GetObject("AddUser", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap apache {
-            get {
-                object obj = ResourceManager.GetObject("apache", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -123,50 +103,9 @@ namespace BFPC_System.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap login {
-            get {
-                object obj = ResourceManager.GetObject("login", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap LoginBackground {
-            get {
-                object obj = ResourceManager.GetObject("LoginBackground", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap LoginBG {
-            get {
-                object obj = ResourceManager.GetObject("LoginBG", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap LogoAPH {
             get {
                 object obj = ResourceManager.GetObject("LogoAPH", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap stock_photo_businessman_works_on_laptop_showing_business_analytics_dashboard_with_charts_metrics_and_kpi_to_2300812275 {
-            get {
-                object obj = ResourceManager.GetObject("stock-photo-businessman-works-on-laptop-showing-business-analytics-dashboard-with" +
-                        "-charts-metrics-and-kpi-to-2300812275", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

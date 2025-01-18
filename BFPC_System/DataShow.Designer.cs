@@ -31,13 +31,12 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DataShow));
             this.panel1 = new System.Windows.Forms.Panel();
             this.splManage = new System.Windows.Forms.SplitContainer();
+            this.btnRandomCheck = new DevExpress.XtraEditors.SimpleButton();
             this.btnComposeEmail = new DevExpress.XtraEditors.SimpleButton();
             this.btnExport = new DevExpress.XtraEditors.SimpleButton();
             this.btnUserManage = new DevExpress.XtraEditors.SimpleButton();
             this.sqlCommand1 = new Microsoft.Data.SqlClient.SqlCommand();
             this.sqlCommand2 = new Microsoft.Data.SqlClient.SqlCommand();
-            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
-            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splManage)).BeginInit();
             this.splManage.Panel1.SuspendLayout();
             this.splManage.Panel2.SuspendLayout();
@@ -47,7 +46,6 @@
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.panel1.Controls.Add(this.webBrowser1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
@@ -66,6 +64,7 @@
             // splManage.Panel1
             // 
             this.splManage.Panel1.BackColor = System.Drawing.Color.Transparent;
+            this.splManage.Panel1.Controls.Add(this.btnRandomCheck);
             this.splManage.Panel1.Controls.Add(this.btnComposeEmail);
             this.splManage.Panel1.Controls.Add(this.btnExport);
             this.splManage.Panel1.Controls.Add(this.btnUserManage);
@@ -78,6 +77,23 @@
             this.splManage.SplitterDistance = 184;
             this.splManage.SplitterWidth = 1;
             this.splManage.TabIndex = 2;
+            // 
+            // btnRandomCheck
+            // 
+            this.btnRandomCheck.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRandomCheck.Appearance.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRandomCheck.Appearance.Options.UseFont = true;
+            this.btnRandomCheck.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnRandomCheck.ImageOptions.Image")));
+            this.btnRandomCheck.Location = new System.Drawing.Point(15, 175);
+            this.btnRandomCheck.LookAndFeel.SkinMaskColor = System.Drawing.Color.SkyBlue;
+            this.btnRandomCheck.LookAndFeel.SkinName = "Coffee";
+            this.btnRandomCheck.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.btnRandomCheck.Name = "btnRandomCheck";
+            this.btnRandomCheck.Size = new System.Drawing.Size(154, 40);
+            this.btnRandomCheck.TabIndex = 1;
+            this.btnRandomCheck.Text = "Kiểm tra ngẫu nhiên";
+            this.btnRandomCheck.Click += new System.EventHandler(this.btnRandomCheck_Click);
             // 
             // btnComposeEmail
             // 
@@ -140,15 +156,6 @@
             this.sqlCommand2.CommandTimeout = 30;
             this.sqlCommand2.EnableOptimizedParameterBinding = false;
             // 
-            // webBrowser1
-            // 
-            this.webBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.webBrowser1.Location = new System.Drawing.Point(0, 0);
-            this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
-            this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(1105, 626);
-            this.webBrowser1.TabIndex = 0;
-            // 
             // DataShow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -158,7 +165,6 @@
             this.Name = "DataShow";
             this.Size = new System.Drawing.Size(1298, 634);
             this.Load += new System.EventHandler(this.DataShow_Load);
-            this.panel1.ResumeLayout(false);
             this.splManage.Panel1.ResumeLayout(false);
             this.splManage.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splManage)).EndInit();
@@ -176,6 +182,6 @@
         private DevExpress.XtraEditors.SimpleButton btnExport;
         private Microsoft.Data.SqlClient.SqlCommand sqlCommand2;
         private DevExpress.XtraEditors.SimpleButton btnComposeEmail;
-        private System.Windows.Forms.WebBrowser webBrowser1;
+        private DevExpress.XtraEditors.SimpleButton btnRandomCheck;
     }
 }

@@ -200,7 +200,7 @@ namespace BFPC_System
                 {
                     DateTime selectedDate = dtpReportDate.Value.Date;
 
-                    List<string> allLineNames = dbManager.GetProductionLines(selectedPlantName);
+                    List<string> allLineNames = dbManager.LoadProductionLines(selectedPlantName);
 
                     DataTable dataTable = new DataTable();
 
@@ -332,7 +332,7 @@ namespace BFPC_System
 
                 if (selectedLineIDs.Count > 0)
                 {
-                    List<string> allLineNames = dbManager.GetProductionLines(selectedPlantName);
+                    List<string> allLineNames = dbManager.LoadProductionLines(selectedPlantName);
 
                     DateTime selectedDate = dtpReportDate.Value.Date;
 

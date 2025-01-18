@@ -65,6 +65,31 @@ namespace BPFC_System
             }
         }
 
+
+        public List<string> LoadProductionLines(string plantName)
+        {
+            List<string> lines = new List<string>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand("SELECT LineName FROM ProductionLines WHERE PlantID IN (SELECT PlantID FROM Plant WHERE PlantName = @SelectedPlant AND IsActive = @IsActive)", connection))
+            {
+                cmd.Parameters.AddWithValue("@SelectedPlant", plantName);
+                cmd.Parameters.AddWithValue("@IsActive" ,true);
+                connection.Open();
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string lineName = reader["LineName"].ToString();
+                        lines.Add(lineName);
+                    }
+                }
+            }
+
+            return lines;
+        }
+
         public List<string> GetArticleNamesToCreate()
         {
             List<string> articleNames = new List<string>();
@@ -123,13 +148,6 @@ namespace BPFC_System
                     return false;
                 }
             }
-        }
-        // Trong class DatabaseManager
-        public void SortProductionLines(ListView lvProductionLines)
-        {
-            lvProductionLines.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            lvProductionLines.ListViewItemSorter = new ListViewItemComparer();
-            lvProductionLines.Sort();
         }
 
         public class ListViewItemComparer : IComparer
@@ -210,28 +228,6 @@ namespace BPFC_System
             }
         }
 
-
-
-        public List<string> GetProductionLines(string plantName)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand("SELECT LineName FROM ProductionLines WHERE PlantID = (SELECT PlantID FROM Plant WHERE PlantName = @PlantName)", connection))
-            {
-                cmd.Parameters.AddWithValue("@PlantName", plantName);
-                List<string> productionLines = new List<string>();
-                connection.Open();
-
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        productionLines.Add(reader["LineName"].ToString());
-                    }
-                }
-
-                return productionLines;
-            }
-        }
 
         private void DeleteProductionLines(string plantName, SqlConnection connection, SqlTransaction transaction)
         {
@@ -507,9 +503,10 @@ namespace BPFC_System
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand("SELECT LineID FROM ProductionLines WHERE PlantID = (SELECT PlantID FROM Plant WHERE PlantName = @PlantName)", connection))
+                using (SqlCommand cmd = new SqlCommand("SELECT LineID FROM ProductionLines WHERE PlantID = (SELECT PlantID FROM Plant WHERE PlantName = @PlantName) AND IsActive = @IsActive", connection))
                 {
                     cmd.Parameters.AddWithValue("@PlantName", selectedPlantName);
+                    cmd.Parameters.AddWithValue("@IsActive", true);
                     connection.Open();
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -785,27 +782,71 @@ namespace BPFC_System
                     // Lấy ArticlePartID từ Dictionary partIds
                     int articlePartId = partIds.ContainsKey(partName) ? partIds[partName] : 0;
 
+                    // Chuyển đổi StdTemp_X từ chuỗi sang float (loại bỏ " ±5" nếu có)
+                    float stdTemp1 = string.IsNullOrEmpty(values[1]) ? 0.0f : float.Parse(values[1].Replace(" ±5", ""));
+                    float stdTemp2 = string.IsNullOrEmpty(values[4]) ? 0.0f : float.Parse(values[4].Replace(" ±5", ""));
+                    float stdTemp3 = string.IsNullOrEmpty(values[7]) ? 0.0f : float.Parse(values[7].Replace(" ±5", ""));
+
+                    // In ra console các giá trị trước khi thực hiện UPDATE (nếu cần)
+                    Console.WriteLine($"Updating TemperatureResults for Partname: {partName}");
+                    Console.WriteLine($"ArticlePartID: {articlePartId}");
+                    Console.WriteLine($"ActualTemp_1: {values[0]}, StdTemp_1: {stdTemp1}, Result_1: {values[2]}");
+                    Console.WriteLine($"ActualTemp_2: {values[3]}, StdTemp_2: {stdTemp2}, Result_2: {values[5]}");
+                    Console.WriteLine($"ActualTemp_3: {values[6]}, StdTemp_3: {stdTemp3}, Result_3: {values[8]}");
+                    Console.WriteLine($"ReportDate: {reportDate}");
+
                     string query = $@"UPDATE TemperatureResults
                 SET ArticlePartID = @ArticlePartID,
-                    ActualTemp_1 = @ActualTemp1,
+                    {(string.IsNullOrEmpty(values[0]) ? "" : "ActualTemp_1 = @ActualTemp1,")}
+                    {(string.IsNullOrEmpty(values[1]) ? "" : "StandardTemp_1 = @StdTemp1,")}
                     Result_1 = @Result1,
-                    ActualTemp_2 = @ActualTemp2,
+                    {(string.IsNullOrEmpty(values[3]) ? "" : "ActualTemp_2 = @ActualTemp2,")}
+                    {(string.IsNullOrEmpty(values[4]) ? "" : "StandardTemp_2 = @StdTemp2,")}
                     Result_2 = @Result2,
-                    ActualTemp_3 = @ActualTemp3,
+                    {(string.IsNullOrEmpty(values[6]) ? "" : "ActualTemp_3 = @ActualTemp3,")}
+                    {(string.IsNullOrEmpty(values[7]) ? "" : "StandardTemp_3 = @StdTemp3,")}
                     Result_3 = @Result3
                 WHERE LineID = @LineID AND Partname = @Partname AND CAST(ReportDate AS DATE) = CAST(@ReportDate AS DATE)";
+
+                    // Loại bỏ dấu phẩy dư thừa cuối cùng trước WHERE
+                    query = query.Replace(", WHERE", " WHERE");
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@LineID", lineId);
                         command.Parameters.AddWithValue("@Partname", partName);
                         command.Parameters.AddWithValue("@ArticlePartID", (object)articlePartId ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@ActualTemp1", (object)values[0] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Result1", (object)values[1] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@ActualTemp2", (object)values[2] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Result2", (object)values[3] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@ActualTemp3", (object)values[4] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Result3", (object)values[5] ?? DBNull.Value);
+
+                        if (!string.IsNullOrEmpty(values[0]))
+                        {
+                            command.Parameters.AddWithValue("@ActualTemp1", float.Parse(values[0]));
+                        }
+                        if (!string.IsNullOrEmpty(values[1]))
+                        {
+                            command.Parameters.AddWithValue("@StdTemp1", stdTemp1);
+                        }
+                        command.Parameters.AddWithValue("@Result1", (object)values[2] ?? DBNull.Value);
+
+                        if (!string.IsNullOrEmpty(values[3]))
+                        {
+                            command.Parameters.AddWithValue("@ActualTemp2", float.Parse(values[3]));
+                        }
+                        if (!string.IsNullOrEmpty(values[4]))
+                        {
+                            command.Parameters.AddWithValue("@StdTemp2", stdTemp2);
+                        }
+                        command.Parameters.AddWithValue("@Result2", (object)values[5] ?? DBNull.Value);
+
+                        if (!string.IsNullOrEmpty(values[6]))
+                        {
+                            command.Parameters.AddWithValue("@ActualTemp3", float.Parse(values[6]));
+                        }
+                        if (!string.IsNullOrEmpty(values[7]))
+                        {
+                            command.Parameters.AddWithValue("@StdTemp3", stdTemp3);
+                        }
+                        command.Parameters.AddWithValue("@Result3", (object)values[8] ?? DBNull.Value);
+
                         command.Parameters.AddWithValue("@ReportDate", reportDate.Date);
 
                         command.ExecuteNonQuery();
@@ -830,12 +871,19 @@ namespace BPFC_System
 
                     string query = $@"UPDATE TimeResults
                 SET ArticlePartID = @ArticlePartID,
+
                     ActualTime_1 = @ActualTime1,
+                    StandardTime_1 = @StdTime1,
                     Result_1 = @Result1,
+
                     ActualTime_2 = @ActualTime2,
+                    StandardTime_2 = @StdTime2,
                     Result_2 = @Result2,
+
                     ActualTime_3 = @ActualTime3,
+                    StandardTime_3 = @StdTime3,
                     Result_3 = @Result3
+
                 WHERE LineID = @LineID AND Partname = @Partname AND CAST(ReportDate AS DATE) = CAST(@ReportDate AS DATE)";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
@@ -844,11 +892,14 @@ namespace BPFC_System
                         command.Parameters.AddWithValue("@Partname", partName);
                         command.Parameters.AddWithValue("@ArticlePartID", (object)articlePartId ?? DBNull.Value);
                         command.Parameters.AddWithValue("@ActualTime1", (object)values[0] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Result1", (object)values[1] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@ActualTime2", (object)values[2] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Result2", (object)values[3] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@ActualTime3", (object)values[4] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Result3", (object)values[5] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@StdTime1", (object)values[1] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Result1", (object)values[2] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@ActualTime2", (object)values[3] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@StdTime2", (object)values[4] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Result2", (object)values[5] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@ActualTime3", (object)values[6] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@StdTime3", (object)values[7] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Result3", (object)values[8] ?? DBNull.Value);
                         command.Parameters.AddWithValue("@ReportDate", reportDate.Date);
 
                         command.ExecuteNonQuery();
@@ -911,20 +962,27 @@ namespace BPFC_System
 
         private void SaveTimeResultsForPart(SqlConnection connection, int lineId, int articlePartId, string partName, string[] timeResults, int userId, DateTime reportDate)
         {
-            string query = @"INSERT INTO TimeResults (LineID, ArticlePartID, Partname, ActualTime_1, Result_1, ActualTime_2, Result_2, ActualTime_3, Result_3, RecordedBy, ReportDate)
-      VALUES (@LineID, @ArticlePartID, @Partname, @ActualTime1, @Result1, @ActualTime2, @Result2, @ActualTime3, @Result3, @RecordedBy, @ReportDate)";
+            string query = @"INSERT INTO TimeResults (LineID, ArticlePartID, Partname, ActualTime_1, StandardTime_1, Result_1, ActualTime_2, StandardTime_2, Result_2, ActualTime_3, StandardTime_3, Result_3, RecordedBy, ReportDate)
+      VALUES (@LineID, @ArticlePartID, @Partname, @ActualTime1, @StdTime1, @Result1, @ActualTime2, @StdTime2, @Result2, @ActualTime3, @StdTime3, @Result3, @RecordedBy, @ReportDate)";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@LineID", lineId);
                 command.Parameters.AddWithValue("@ArticlePartID", (object)articlePartId ?? DBNull.Value);
                 command.Parameters.AddWithValue("@Partname", partName);
+
                 command.Parameters.AddWithValue("@ActualTime1", (object)timeResults[0] ?? DBNull.Value);
-                command.Parameters.AddWithValue("@Result1", (object)timeResults[1] ?? DBNull.Value);
-                command.Parameters.AddWithValue("@ActualTime2", (object)timeResults[2] ?? DBNull.Value);
-                command.Parameters.AddWithValue("@Result2", (object)timeResults[3] ?? DBNull.Value);
-                command.Parameters.AddWithValue("@ActualTime3", (object)timeResults[4] ?? DBNull.Value);
-                command.Parameters.AddWithValue("@Result3", (object)timeResults[5] ?? DBNull.Value);
+                command.Parameters.AddWithValue("@StdTime1", (object)timeResults[1] ?? DBNull.Value);
+                command.Parameters.AddWithValue("@Result1", (object)timeResults[2] ?? DBNull.Value);
+
+                command.Parameters.AddWithValue("@ActualTime2", (object)timeResults[3] ?? DBNull.Value);
+                command.Parameters.AddWithValue("@StdTime2", (object)timeResults[4] ?? DBNull.Value);
+                command.Parameters.AddWithValue("@Result2", (object)timeResults[5] ?? DBNull.Value);
+
+                command.Parameters.AddWithValue("@ActualTime3", (object)timeResults[6] ?? DBNull.Value);
+                command.Parameters.AddWithValue("@StdTime3", (object)timeResults[7] ?? DBNull.Value);
+                command.Parameters.AddWithValue("@Result3", (object)timeResults[8] ?? DBNull.Value);
+
                 command.Parameters.AddWithValue("@RecordedBy", userId);
                 command.Parameters.AddWithValue("@ReportDate", reportDate.Date);
 
@@ -934,8 +992,8 @@ namespace BPFC_System
 
         private void SaveTemperatureResultsForPart(SqlConnection connection, int lineId, int articlePartId, string partName, string[] tempResults, int userId, DateTime reportDate)
         {
-            string query = @"INSERT INTO TemperatureResults (LineID, ArticlePartID, Partname, ActualTemp_1, Result_1, ActualTemp_2, Result_2, ActualTemp_3, Result_3, RecordedBy, ReportDate)
-        VALUES (@LineID, @ArticlePartID, @Partname, @ActualTemp1, @Result1, @ActualTemp2, @Result2, @ActualTemp3, @Result3, @RecordedBy, @ReportDate)";
+            string query = @"INSERT INTO TemperatureResults (LineID, ArticlePartID, Partname, ActualTemp_1, StandardTemp_1, Result_1, ActualTemp_2, StandardTemp_2, Result_2, ActualTemp_3, StandardTemp_3, Result_3, RecordedBy, ReportDate)
+    VALUES (@LineID, @ArticlePartID, @Partname, @ActualTemp1, @StdTemp1, @Result1, @ActualTemp2, @StdTemp2, @Result2, @ActualTemp3, @StdTemp3, @Result3, @RecordedBy, @ReportDate)";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {
@@ -949,21 +1007,42 @@ namespace BPFC_System
                 else
                     command.Parameters.Add("@ActualTemp1", SqlDbType.Float).Value = DBNull.Value;
 
-                command.Parameters.AddWithValue("@Result1", tempResults[1] != null ? (object)tempResults[1] : DBNull.Value);
+                // Remove " ±5" from StandardTemp_1
+                string standardTemp1 = tempResults[1]?.Replace(" ±5", string.Empty);
+                if (float.TryParse(standardTemp1, out float stdTemp1))
+                    command.Parameters.AddWithValue("@StdTemp1", stdTemp1);
+                else
+                    command.Parameters.Add("@StdTemp1", SqlDbType.Float).Value = DBNull.Value;
 
-                if (float.TryParse(tempResults[2], out float actualTemp2))
+                command.Parameters.AddWithValue("@Result1", tempResults[2] != null ? (object)tempResults[2] : DBNull.Value);
+
+                if (float.TryParse(tempResults[3], out float actualTemp2))
                     command.Parameters.AddWithValue("@ActualTemp2", actualTemp2);
                 else
                     command.Parameters.Add("@ActualTemp2", SqlDbType.Float).Value = DBNull.Value;
 
-                command.Parameters.AddWithValue("@Result2", tempResults[3] != null ? (object)tempResults[3] : DBNull.Value);
+                // Remove " ±5" from StandardTemp_2
+                string standardTemp2 = tempResults[4]?.Replace(" ±5", string.Empty);
+                if (float.TryParse(standardTemp2, out float stdTemp2))
+                    command.Parameters.AddWithValue("@StdTemp2", stdTemp2);
+                else
+                    command.Parameters.Add("@StdTemp2", SqlDbType.Float).Value = DBNull.Value;
 
-                if (float.TryParse(tempResults[4], out float actualTemp3))
+                command.Parameters.AddWithValue("@Result2", tempResults[5] != null ? (object)tempResults[5] : DBNull.Value);
+
+                if (float.TryParse(tempResults[6], out float actualTemp3))
                     command.Parameters.AddWithValue("@ActualTemp3", actualTemp3);
                 else
                     command.Parameters.Add("@ActualTemp3", SqlDbType.Float).Value = DBNull.Value;
 
-                command.Parameters.AddWithValue("@Result3", tempResults[5] != null ? (object)tempResults[5] : DBNull.Value);
+                // Remove " ±5" from StandardTemp_3
+                string standardTemp3 = tempResults[7]?.Replace(" ±5", string.Empty);
+                if (float.TryParse(standardTemp3, out float stdTemp3))
+                    command.Parameters.AddWithValue("@StdTemp3", stdTemp3);
+                else
+                    command.Parameters.Add("@StdTemp3", SqlDbType.Float).Value = DBNull.Value;
+
+                command.Parameters.AddWithValue("@Result3", tempResults[8] != null ? (object)tempResults[8] : DBNull.Value);
 
                 command.Parameters.AddWithValue("@RecordedBy", userId);
                 command.Parameters.AddWithValue("@ReportDate", reportDate.Date);
@@ -1034,12 +1113,19 @@ namespace BPFC_System
 
                     string query = $@"UPDATE ChemicalResults
                 SET ArticlePartID = @ArticlePartID,
+
                     ActualChemical_1 = @ActualChemical1,
+                    StandardChemical_1 = @StdChemical1,
                     Result_1 = @Result1,
+
                     ActualChemical_2 = @ActualChemical2,
+                    StandardChemical_2 = @StdChemical2,
                     Result_2 = @Result2,
+
                     ActualChemical_3 = @ActualChemical3,
+                    StandardChemical_3 = @StdChemical3,
                     Result_3 = @Result3
+
                 WHERE LineID = @LineID AND Partname = @Partname AND ReportDate = @ReportDate";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
@@ -1047,12 +1133,19 @@ namespace BPFC_System
                         command.Parameters.AddWithValue("@LineID", lineId);
                         command.Parameters.AddWithValue("@Partname", partName);
                         command.Parameters.AddWithValue("@ArticlePartID", (object)articlePartId ?? DBNull.Value);
+
                         command.Parameters.AddWithValue("@ActualChemical1", (object)values[0] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Result1", (object)values[1] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@ActualChemical2", (object)values[2] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Result2", (object)values[3] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@ActualChemical3", (object)values[4] ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Result3", (object)values[5] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@StdChemical1", (object)values[1] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Result1", (object)values[2] ?? DBNull.Value);
+
+                        command.Parameters.AddWithValue("@ActualChemical2", (object)values[3] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@StdChemical2", (object)values[4] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Result2", (object)values[5] ?? DBNull.Value);
+
+                        command.Parameters.AddWithValue("@ActualChemical3", (object)values[6] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@StdChemical3", (object)values[7] ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Result3", (object)values[8] ?? DBNull.Value);
+
                         command.Parameters.AddWithValue("@ReportDate", reportDate);
 
                         command.ExecuteNonQuery();
@@ -1080,20 +1173,27 @@ namespace BPFC_System
 
         private void SaveChemicalResultsForPart(SqlConnection connection, int lineId, int articlePartId, string partName, string[] chemicalResults, DateTime reportDate)
         {
-            string query = @"INSERT INTO ChemicalResults (LineID, ArticlePartID, Partname, ActualChemical_1, Result_1, ActualChemical_2, Result_2, ActualChemical_3, Result_3, ReportDate)
-              VALUES (@LineID, @ArticlePartID, @Partname, @ActualChemical1, @Result1, @ActualChemical2, @Result2, @ActualChemical3, @Result3, @ReportDate)";
+            string query = @"INSERT INTO ChemicalResults (LineID, ArticlePartID, Partname, ActualChemical_1, StandardChemical_1, Result_1, ActualChemical_2, StandardChemical_2, Result_2, ActualChemical_3, StandardChemical_3, Result_3, ReportDate)
+                      VALUES (@LineID, @ArticlePartID, @Partname, @ActualChemical1, @StdChemical1, @Result1, @ActualChemical2, @StdChemical2, @Result2, @ActualChemical3, @StdChemical3, @Result3, @ReportDate)";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@LineID", lineId);
                 command.Parameters.AddWithValue("@ArticlePartID", (object)articlePartId ?? DBNull.Value);
                 command.Parameters.AddWithValue("@Partname", partName);
+
                 command.Parameters.AddWithValue("@ActualChemical1", (object)chemicalResults[0] ?? DBNull.Value);
-                command.Parameters.AddWithValue("@Result1", (object)chemicalResults[1] ?? DBNull.Value);
-                command.Parameters.AddWithValue("@ActualChemical2", (object)chemicalResults[2] ?? DBNull.Value);
-                command.Parameters.AddWithValue("@Result2", (object)chemicalResults[3] ?? DBNull.Value);
-                command.Parameters.AddWithValue("@ActualChemical3", (object)chemicalResults[4] ?? DBNull.Value);
-                command.Parameters.AddWithValue("@Result3", (object)chemicalResults[5] ?? DBNull.Value);
+                command.Parameters.AddWithValue("@StdChemical1", (object)chemicalResults[1] ?? DBNull.Value);
+                command.Parameters.AddWithValue("@Result1", (object)chemicalResults[2] ?? DBNull.Value);
+
+                command.Parameters.AddWithValue("@ActualChemical2", (chemicalResults.Length > 3) ? (object)chemicalResults[3] ?? DBNull.Value : DBNull.Value);
+                command.Parameters.AddWithValue("@StdChemical2", (chemicalResults.Length > 4) ? (object)chemicalResults[4] ?? DBNull.Value : DBNull.Value);
+                command.Parameters.AddWithValue("@Result2", (chemicalResults.Length > 5) ? (object)chemicalResults[5] ?? DBNull.Value : DBNull.Value);
+
+                command.Parameters.AddWithValue("@ActualChemical3", (chemicalResults.Length > 6) ? (object)chemicalResults[6] ?? DBNull.Value : DBNull.Value);
+                command.Parameters.AddWithValue("@StdChemical3", (chemicalResults.Length > 7) ? (object)chemicalResults[7] ?? DBNull.Value : DBNull.Value);
+                command.Parameters.AddWithValue("@Result3", (chemicalResults.Length > 8) ? (object)chemicalResults[8] ?? DBNull.Value : DBNull.Value);
+
                 command.Parameters.AddWithValue("@ReportDate", reportDate);
 
                 command.ExecuteNonQuery();

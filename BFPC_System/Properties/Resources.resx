@@ -121,29 +121,11 @@
   <data name="AddUser" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\AddUser.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="LoginBG" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\LoginBG.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="LoginBackground" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\LoginBackground.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="stock-photo-businessman-works-on-laptop-showing-business-analytics-dashboard-with-charts-metrics-and-kpi-to-2300812275" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\stock-photo-businessman-works-on-laptop-showing-business-analytics-dashboard-with-charts-metrics-and-kpi-to-2300812275.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="4_Ways_Shape_Operational_Excellence_blog_main" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\4_Ways_Shape_Operational_Excellence_blog_main.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="apache" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\apache.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="3d9f16c3b9a9db92d33f9fc86d3607cd" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\3d9f16c3b9a9db92d33f9fc86d3607cd.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="AuditSystemBg" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\AuditSystemBg.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="login" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\login.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="LogoAPH" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\LogoAPH.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

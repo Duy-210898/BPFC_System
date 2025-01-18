@@ -1,7 +1,8 @@
-﻿using BPFC_System;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using Microsoft.Win32;
 using System.Configuration;
+using BPFC_System;
 
 namespace BFPC_System
 {
@@ -10,10 +11,13 @@ namespace BFPC_System
         [STAThread]
         static void Main()
         {
+            // Lấy chuỗi kết nối từ cấu hình appconfig
             string connectionString = ConfigurationManager.ConnectionStrings["strCon"].ConnectionString;
 
+            // Khởi tạo tài khoản admin nếu chưa có
             InitializeAdminAccount(connectionString);
 
+            // Khởi động ứng dụng
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Form formToOpen = new frmLogin();

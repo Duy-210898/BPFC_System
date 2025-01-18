@@ -48,7 +48,8 @@ namespace BFPC_System
 
             menuItemDataTableMapping = new Dictionary<ToolStripMenuItem, DataTable>();
             dtpReportDate.CustomFormat = "dddd dd/MM/yyyy";
-            dtpReportDate.MaxDate = DateTime.Now;
+            dtpReportDate.MinDate = new DateTime(1900, 1, 1);
+            dtpReportDate.MaxDate = new DateTime(2100, 12, 31);
 
             SetInitialDateTimeValue();
             EnableDoubleBufferingForControls(this);
@@ -104,8 +105,10 @@ namespace BFPC_System
             dgvReport.ColumnHeadersDefaultCellStyle.Padding = new Padding(10, 5, 10, 5);
             dgvReport.EnableHeadersVisualStyles = false;
             dgvReport.RowHeadersDefaultCellStyle.BackColor = System.Drawing.Color.White;
-            dgvReport.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing; 
+            dgvReport.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             dgvReport.RowHeadersVisible = false;
+
+            // Ẩn cột FirstLetter nếu tồn tại
         }
 
         private void LoadMenu()
@@ -283,7 +286,7 @@ namespace BFPC_System
 
                     shouldDisplayDataOnDataGridView = false;
                     PlantResults();
-                    shouldDisplayDataOnDataGridView = true; 
+                    shouldDisplayDataOnDataGridView = true;
                 }
             }
         }
@@ -313,7 +316,7 @@ namespace BFPC_System
                 Filter = "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*",
                 FilterIndex = 1,
                 RestoreDirectory = true,
-                InitialDirectory = @"S:\TEMP\ME"
+                InitialDirectory = @"D:\Report"
             };
 
             DateTime selectedDate = dtpReportDate.Value;
@@ -364,7 +367,7 @@ namespace BFPC_System
                 dgvReport.DataSource = originalDataSource;
                 dgvReport.ResumeLayout();
 
-                callback(); 
+                callback();
             }
         }
 
@@ -402,6 +405,8 @@ namespace BFPC_System
                             Freeze5Columns(dgvReport);
 
                             SetColumnHeaders();
+
+                            SortDataTableByLineName(plantDataTable);
 
                             SetColumnDisplayIndexes(dgvReport);
 
@@ -455,7 +460,7 @@ namespace BFPC_System
                 if (dgvReport.Rows.Count > 0)
                 {
                     List<string> dayColumnNames;
-                    DateTime selectedMonth = dtpReportDate.Value; 
+                    DateTime selectedMonth = dtpReportDate.Value;
 
                     monthlyReportDataTable = CreateMonthlyReportDataTable(selectedMonth, out dayColumnNames);
 
@@ -754,7 +759,7 @@ namespace BFPC_System
             dgvReport.Columns["LineName"].HeaderText = "";
             dgvReport.Columns["PlantName"].DisplayIndex = 0;
             dgvReport.Refresh();
-            
+
         }
         private void ShowNoDataWarning(string reportType)
         {
@@ -929,9 +934,9 @@ namespace BFPC_System
             {
                 string columnName = column.ColumnName;
 
-                if (columnName != "LineID") 
+                if (columnName != "LineID")
                 {
-                    if (columnName.Contains("Result"))  
+                    if (columnName.Contains("Result"))
                     {
                         dailyReportDataTable.Rows[0][columnName] = CalculateCompliancePercentage(dailyReportDataTable, columnName).ToString("0.0") + "%";
                         dailyReportDataTable.Rows[1][columnName] = CountPassInColumn(dailyReportDataTable, columnName).ToString();
@@ -945,6 +950,8 @@ namespace BFPC_System
         private void dtpReportDate_ValueChanged(object sender, EventArgs e)
         {
             DailyPlantResults();
+            dtpReportDate.Update();
+            Console.WriteLine($"DateTimePicker new value: {dtpReportDate.Value}");
         }
         private void dgvDaily_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
@@ -966,8 +973,12 @@ namespace BFPC_System
                 {
                     if (e.Value != null && float.TryParse(e.Value.ToString(), out float temperature))
                     {
-                        e.Value = temperature.ToString() + " ±5°C";
-                        e.FormattingApplied = true;
+                        // Chỉ thêm chuỗi " ±5°C" khi giá trị không phải là null hoặc chuỗi rỗng
+                        if (!string.IsNullOrEmpty(e.Value.ToString()))
+                        {
+                            e.Value = temperature.ToString() + " ±5°C";
+                            e.FormattingApplied = true;
+                        }
                     }
                 }
                 else if (e.ColumnIndex >= 0 && e.RowIndex >= 0)
@@ -977,7 +988,7 @@ namespace BFPC_System
                     if (cell.Value != null && cell.Value.ToString() == "FAIL")
                     {
                         cell.Style.BackColor = System.Drawing.Color.LightGoldenrodYellow;
-                        cell.Style.ForeColor = System.Drawing.Color.Red; 
+                        cell.Style.ForeColor = System.Drawing.Color.Red;
                     }
                     if (cell.Value != null && cell.Value.ToString() == "PASS")
                     {
@@ -988,7 +999,7 @@ namespace BFPC_System
                     if (cell.Value != null && cell.Value.ToString() == "OFF DAY")
                     {
                         cell.Style.BackColor = System.Drawing.Color.Orange;
-                    }    
+                    }
 
                     if (e.RowIndex <= 3)
                     {
@@ -1082,7 +1093,7 @@ namespace BFPC_System
                 SetColumnValue(row, "ResultTemp_3", item.ResultTemp_3);
 
                 // Time columns
-                SetColumnValue(row, "StandardTime_1", item.StandardTime_1); 
+                SetColumnValue(row, "StandardTime_1", item.StandardTime_1);
                 SetColumnValue(row, "ActualTime_1", item.ActualTime_1);
                 SetColumnValue(row, "ResultTime_1", item.ResultTime_1);
                 SetColumnValue(row, "StandardTime_2", item.StandardTime_2);
@@ -1263,6 +1274,18 @@ namespace BFPC_System
                 DataGridViewColumn column = dataGridView.Columns[columnName];
                 column.DisplayIndex = newDisplayIndex;
             }
+
+            if (dataGridView.Columns.Contains("FirstLetter"))
+            {
+                dataGridView.Columns["FirstLetter"].Visible = false;
+            }
+
+            // Ẩn cột LineNumber nếu tồn tại
+            if (dataGridView.Columns.Contains("LineNumber"))
+            {
+                dataGridView.Columns["LineNumber"].Visible = false;
+            }
+
         }
 
         private void LoadPlantNames()
@@ -1294,13 +1317,13 @@ namespace BFPC_System
                         if (timeResult == "FAIL")
                         {
                             hasFail = true;
-                            break; 
+                            break;
                         }
                         else if (timeResult == "PASS")
                         {
                             hasPass = true;
                         }
-                        else if (string.IsNullOrEmpty(timeResult)) 
+                        else if (string.IsNullOrEmpty(timeResult))
                         {
                             hasNull = true;
                         }
@@ -1345,7 +1368,7 @@ namespace BFPC_System
                         if (tempResult == "FAIL")
                         {
                             hasFail = true;
-                            break; 
+                            break;
                         }
                         else if (tempResult == "PASS")
                         {

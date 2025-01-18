@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Windows.Forms;
+using static BPFC_System.DatabaseManager;
 
 namespace BPFC_System
 {
@@ -180,13 +181,20 @@ namespace BPFC_System
         private void LoadProductionLines(string selectedPlantName)
         {
             lvProductionLines.Items.Clear();
-            List<string> productionLines = dbManager.GetProductionLines(selectedPlantName);
-
+            List<string> productionLines = dbManager.LoadProductionLines(selectedPlantName);
+ 
             // Hiển thị danh sách trước khi sắp xếp
             lvProductionLines.Items.AddRange(productionLines.Select(line => new ListViewItem(line)).ToArray());
 
             // Sắp xếp danh sách trong lvProductionLines
-            dbManager.SortProductionLines(lvProductionLines);
+            SortProductionLines(lvProductionLines);
+        }
+
+        public void SortProductionLines(ListView listview)
+        {
+            listview.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            listview.ListViewItemSorter = new ListViewItemComparer();
+            listview.Sort();
         }
 
         private void btnSave_Click(object sender, EventArgs e)

@@ -93,11 +93,14 @@
             this.txtResultTime3Upper = new System.Windows.Forms.TextBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.pnlHeader = new System.Windows.Forms.Panel();
+            this.btnHome = new DevExpress.XtraEditors.SimpleButton();
             this.panel3 = new System.Windows.Forms.Panel();
             this.btnDeleteArt = new DevExpress.XtraEditors.SimpleButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.lvArticleToCreate = new System.Windows.Forms.ListView();
             this.label19 = new System.Windows.Forms.Label();
+            this.togSwitch = new DevExpress.XtraEditors.ToggleSwitch();
+            this.checkboxMultiArticles = new DevExpress.XtraEditors.CheckEdit();
             this.label22 = new System.Windows.Forms.Label();
             this.dtpDate = new System.Windows.Forms.DateTimePicker();
             this.btnCheckArticle = new DevExpress.XtraEditors.SimpleButton();
@@ -114,9 +117,6 @@
             this.txtActivityLog = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
             this.errorToolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.btnHome = new DevExpress.XtraEditors.SimpleButton();
-            this.togSwitch = new DevExpress.XtraEditors.ToggleSwitch();
-            this.checkboxMultiArticles = new DevExpress.XtraEditors.CheckEdit();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -129,12 +129,12 @@
             this.pnlHeader.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.togSwitch.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.checkboxMultiArticles.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.togSwitch.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.checkboxMultiArticles.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // panel2
@@ -157,7 +157,7 @@
             this.btnCancel.Appearance.ForeColor = System.Drawing.Color.Black;
             this.btnCancel.Appearance.Options.UseFont = true;
             this.btnCancel.Appearance.Options.UseForeColor = true;
-            this.btnCancel.Location = new System.Drawing.Point(793, 6);
+            this.btnCancel.Location = new System.Drawing.Point(809, 6);
             this.btnCancel.LookAndFeel.SkinMaskColor = System.Drawing.Color.SteelBlue;
             this.btnCancel.LookAndFeel.SkinName = "Glass Oceans";
             this.btnCancel.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -175,7 +175,7 @@
             this.btnSave.Appearance.ForeColor = System.Drawing.Color.Black;
             this.btnSave.Appearance.Options.UseFont = true;
             this.btnSave.Appearance.Options.UseForeColor = true;
-            this.btnSave.Location = new System.Drawing.Point(898, 6);
+            this.btnSave.Location = new System.Drawing.Point(914, 6);
             this.btnSave.LookAndFeel.SkinMaskColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
             this.btnSave.LookAndFeel.SkinName = "Glass Oceans";
             this.btnSave.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -1019,6 +1019,26 @@
             this.pnlHeader.Size = new System.Drawing.Size(1296, 186);
             this.pnlHeader.TabIndex = 4;
             // 
+            // btnHome
+            // 
+            this.btnHome.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.btnHome.Appearance.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHome.Appearance.ForeColor = System.Drawing.SystemColors.Control;
+            this.btnHome.Appearance.Options.UseFont = true;
+            this.btnHome.Appearance.Options.UseForeColor = true;
+            this.btnHome.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnHome.ImageOptions.Image")));
+            this.btnHome.Location = new System.Drawing.Point(10, 10);
+            this.btnHome.LookAndFeel.SkinMaskColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            this.btnHome.LookAndFeel.SkinName = "Glass Oceans";
+            this.btnHome.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.btnHome.Name = "btnHome";
+            this.btnHome.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnHome.Size = new System.Drawing.Size(110, 35);
+            this.btnHome.TabIndex = 6;
+            this.btnHome.TabStop = false;
+            this.btnHome.Text = "Trang chủ";
+            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
+            // 
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.Transparent;
@@ -1100,6 +1120,40 @@
             this.label19.TabIndex = 0;
             this.label19.Text = "Article cần kiểm tra:";
             this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // togSwitch
+            // 
+            this.togSwitch.Location = new System.Drawing.Point(49, 11);
+            this.togSwitch.Name = "togSwitch";
+            this.togSwitch.Properties.Appearance.BackColor = System.Drawing.Color.Transparent;
+            this.togSwitch.Properties.Appearance.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.togSwitch.Properties.Appearance.ForeColor = System.Drawing.SystemColors.Control;
+            this.togSwitch.Properties.Appearance.Options.UseBackColor = true;
+            this.togSwitch.Properties.Appearance.Options.UseFont = true;
+            this.togSwitch.Properties.Appearance.Options.UseForeColor = true;
+            this.togSwitch.Properties.LookAndFeel.SkinMaskColor = System.Drawing.Color.DarkOrange;
+            this.togSwitch.Properties.LookAndFeel.SkinMaskColor2 = System.Drawing.Color.Black;
+            this.togSwitch.Properties.LookAndFeel.SkinName = "Glass Oceans";
+            this.togSwitch.Properties.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.togSwitch.Properties.OffText = "Ngày trước";
+            this.togSwitch.Properties.OnText = "Ngày được chọn";
+            this.togSwitch.Size = new System.Drawing.Size(258, 29);
+            this.togSwitch.TabIndex = 11;
+            this.togSwitch.TabStop = false;
+            this.togSwitch.Toggled += new System.EventHandler(this.togSwitch_Toggled);
+            // 
+            // checkboxMultiArticles
+            // 
+            this.checkboxMultiArticles.Location = new System.Drawing.Point(463, 26);
+            this.checkboxMultiArticles.Name = "checkboxMultiArticles";
+            this.checkboxMultiArticles.Properties.Appearance.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkboxMultiArticles.Properties.Appearance.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.checkboxMultiArticles.Properties.Appearance.Options.UseFont = true;
+            this.checkboxMultiArticles.Properties.Appearance.Options.UseForeColor = true;
+            this.checkboxMultiArticles.Properties.Caption = "";
+            this.checkboxMultiArticles.Size = new System.Drawing.Size(19, 20);
+            this.checkboxMultiArticles.TabIndex = 10;
+            this.checkboxMultiArticles.TabStop = false;
             // 
             // label22
             // 
@@ -1306,65 +1360,11 @@
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label17.ForeColor = System.Drawing.SystemColors.Control;
-            this.label17.Location = new System.Drawing.Point(104, 498);
+            this.label17.Location = new System.Drawing.Point(90, 498);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(193, 15);
             this.label17.TabIndex = 25;
             this.label17.Text = "Developed by the ME  Department";
-            // 
-            // btnHome
-            // 
-            this.btnHome.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
-            this.btnHome.Appearance.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnHome.Appearance.ForeColor = System.Drawing.SystemColors.Control;
-            this.btnHome.Appearance.Options.UseFont = true;
-            this.btnHome.Appearance.Options.UseForeColor = true;
-            this.btnHome.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnHome.ImageOptions.Image")));
-            this.btnHome.Location = new System.Drawing.Point(10, 10);
-            this.btnHome.LookAndFeel.SkinMaskColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            this.btnHome.LookAndFeel.SkinName = "Glass Oceans";
-            this.btnHome.LookAndFeel.UseDefaultLookAndFeel = false;
-            this.btnHome.Name = "btnHome";
-            this.btnHome.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
-            this.btnHome.Size = new System.Drawing.Size(110, 35);
-            this.btnHome.TabIndex = 6;
-            this.btnHome.TabStop = false;
-            this.btnHome.Text = "Trang chủ";
-            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
-            // 
-            // togSwitch
-            // 
-            this.togSwitch.Location = new System.Drawing.Point(49, 11);
-            this.togSwitch.Name = "togSwitch";
-            this.togSwitch.Properties.Appearance.BackColor = System.Drawing.Color.Transparent;
-            this.togSwitch.Properties.Appearance.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.togSwitch.Properties.Appearance.ForeColor = System.Drawing.SystemColors.Control;
-            this.togSwitch.Properties.Appearance.Options.UseBackColor = true;
-            this.togSwitch.Properties.Appearance.Options.UseFont = true;
-            this.togSwitch.Properties.Appearance.Options.UseForeColor = true;
-            this.togSwitch.Properties.LookAndFeel.SkinMaskColor = System.Drawing.Color.DarkOrange;
-            this.togSwitch.Properties.LookAndFeel.SkinMaskColor2 = System.Drawing.Color.Black;
-            this.togSwitch.Properties.LookAndFeel.SkinName = "Glass Oceans";
-            this.togSwitch.Properties.LookAndFeel.UseDefaultLookAndFeel = false;
-            this.togSwitch.Properties.OffText = "Ngày trước";
-            this.togSwitch.Properties.OnText = "Ngày được chọn";
-            this.togSwitch.Size = new System.Drawing.Size(258, 29);
-            this.togSwitch.TabIndex = 11;
-            this.togSwitch.TabStop = false;
-            this.togSwitch.Toggled += new System.EventHandler(this.togSwitch_Toggled);
-            // 
-            // checkboxMultiArticles
-            // 
-            this.checkboxMultiArticles.Location = new System.Drawing.Point(463, 26);
-            this.checkboxMultiArticles.Name = "checkboxMultiArticles";
-            this.checkboxMultiArticles.Properties.Appearance.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkboxMultiArticles.Properties.Appearance.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkboxMultiArticles.Properties.Appearance.Options.UseFont = true;
-            this.checkboxMultiArticles.Properties.Appearance.Options.UseForeColor = true;
-            this.checkboxMultiArticles.Properties.Caption = "";
-            this.checkboxMultiArticles.Size = new System.Drawing.Size(19, 20);
-            this.checkboxMultiArticles.TabIndex = 10;
-            this.checkboxMultiArticles.TabStop = false;
             // 
             // frmPlant
             // 
@@ -1400,13 +1400,13 @@
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.togSwitch.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.checkboxMultiArticles.Properties)).EndInit();
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.togSwitch.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.checkboxMultiArticles.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }

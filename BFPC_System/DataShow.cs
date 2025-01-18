@@ -56,7 +56,7 @@ namespace BPFC_System
         private string FindDefaultAttachment()
         {
             string defaultAttachmentPath = string.Empty;
-            string folderPath = @"S:\TEMP\ME";
+            string folderPath = @"D:\Report";
             string searchPattern = "Daily-Report-BPFC Compliance Checklist*";
 
             try
@@ -404,6 +404,11 @@ namespace BPFC_System
 
         private frmReport reportForm;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnViewExport_Click(object sender, EventArgs e)
         {
             if (reportForm == null || reportForm.IsDisposed)
@@ -425,7 +430,11 @@ namespace BPFC_System
                 reportForm.Focus();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataShow_Load(object sender, EventArgs e)
         {
             BeginInvoke(new System.Action(() =>
@@ -435,12 +444,10 @@ namespace BPFC_System
                 splManage.Panel2.Controls.Add(createDailyControl);
             }));
         }
-
-        private void DataShow_Shown(object sender, EventArgs e)
+        private void btnRandomCheck_Click(object sender, EventArgs e)
         {
-            splManage.Panel2.Controls.Clear();
-            createDailyControl.Dock = DockStyle.Fill;
-            splManage.Panel2.Controls.Add(createDailyControl);
+            frmRandomCheck randomCheckForm = new frmRandomCheck();
+            randomCheckForm.Show();
         }
     }
 }

@@ -341,6 +341,7 @@ namespace BPFC_System
         public string UserName { get; set; }
         private void frmPlant_Load(object sender, EventArgs e)
         {
+            DatabaseManager dbManager = new DatabaseManager(connectionString);
 
             this.KeyPreview = true;
 
@@ -354,19 +355,23 @@ namespace BPFC_System
             {
                 string plantName = plantNameWithXuong.Replace("XƯỞNG ", "");
 
-                List<string> lines = LoadProductionLines(plantName);
+                List<string> lines = dbManager.LoadProductionLines(plantName);
 
                 if (lines.Count > 0)
                 {
                     cbxLines.DataSource = lines;
+                 //   dbManager.SortProductionLines(cbxLines);
                 }
                 else
                 {
                     ShowCenteredMessageBox("Không có Chuyền tương ứng với xưởng này.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+
             lblUserPlant.Text = Globals.Username;
         }
+
+
 
         private void btnCheckArticle_Click(object sender, EventArgs e)
         {
@@ -606,13 +611,13 @@ namespace BPFC_System
 
                     Dictionary<string, string[]> timeResults = new Dictionary<string, string[]>
             {
-                { "Outsole", new string[] { GetNonEmptyText(txtActualTime1Outsole), GetNonEmptyText(txtResultTime1Outsole), GetNonEmptyText(txtActualTime2Outsole), GetNonEmptyText(txtResultTime2Outsole), GetNonEmptyText(txtActualTime3Outsole), GetNonEmptyText(txtResultTime3Outsole) } },
-                { "Upper", new string[] { GetNonEmptyText(txtActualTime1Upper), GetNonEmptyText(txtResultTime1Upper), GetNonEmptyText(txtActualTime2Upper), GetNonEmptyText(txtResultTime2Outsole), GetNonEmptyText(txtActualTime3Upper), GetNonEmptyText(txtResultTime3Upper) } }
+                { "Outsole", new string[] { GetNonEmptyText(txtActualTime1Outsole), GetNonEmptyText(txtStdTime1Outsole), GetNonEmptyText(txtResultTime1Outsole), GetNonEmptyText(txtActualTime2Outsole), GetNonEmptyText(txtStdTime2Outsole), GetNonEmptyText(txtResultTime2Outsole), GetNonEmptyText(txtActualTime3Outsole), GetNonEmptyText(txtStdTime3Outsole), GetNonEmptyText(txtResultTime3Outsole) } },
+                { "Upper", new string[] { GetNonEmptyText(txtActualTime1Upper), GetNonEmptyText(txtStdTime1Upper), GetNonEmptyText(txtResultTime1Upper), GetNonEmptyText(txtActualTime2Upper), GetNonEmptyText(txtStdTime2Upper), GetNonEmptyText(txtResultTime2Upper), GetNonEmptyText(txtActualTime3Upper), GetNonEmptyText(txtStdTime3Upper), GetNonEmptyText(txtResultTime3Upper) } }
             };
                     Dictionary<string, string[]> tempResults = new Dictionary<string, string[]>
             {
-                { "Outsole", new string[] { GetNonEmptyText(txtActualTemp1Outsole), GetNonEmptyText(txtResultTemp1Outsole), GetNonEmptyText(txtActualTemp2Outsole), GetNonEmptyText(txtResultTemp2Outsole), GetNonEmptyText(txtActualTemp3Outsole), GetNonEmptyText(txtResultTemp3Outsole) } },
-                { "Upper", new string[] { GetNonEmptyText(txtActualTemp1Upper), GetNonEmptyText(txtResultTemp1Upper), GetNonEmptyText(txtActualTemp2Upper), GetNonEmptyText(txtResultTemp2Outsole), GetNonEmptyText(txtActualTemp3Upper), GetNonEmptyText(txtResultTemp3Upper) } }
+                { "Outsole", new string[] { GetNonEmptyText(txtActualTemp1Outsole), GetNonEmptyText(txtStdTemp1Outsole), GetNonEmptyText(txtResultTemp1Outsole), GetNonEmptyText(txtActualTemp2Outsole), GetNonEmptyText(txtStdTemp2Outsole), GetNonEmptyText(txtResultTemp2Outsole), GetNonEmptyText(txtActualTemp3Outsole), GetNonEmptyText(txtStdTemp3Outsole), GetNonEmptyText(txtResultTemp3Outsole) } },
+                { "Upper", new string[] { GetNonEmptyText(txtActualTemp1Upper), GetNonEmptyText(txtStdTemp1Upper), GetNonEmptyText(txtResultTemp1Upper), GetNonEmptyText(txtActualTemp2Upper), GetNonEmptyText(txtStdTemp2Upper), GetNonEmptyText(txtResultTemp2Upper), GetNonEmptyText(txtActualTemp3Upper), GetNonEmptyText(txtStdTemp3Upper), GetNonEmptyText(txtResultTemp3Upper) } }
             }; 
                     
                     if (timeDataExists)
@@ -666,14 +671,14 @@ namespace BPFC_System
                 
                 Dictionary<string, string[]> timeValues = new Dictionary<string, string[]>
             {
-                { "Outsole", new string[] { GetNonEmptyText(txtActualTime1Outsole), GetNonEmptyText(txtResultTime1Outsole), GetNonEmptyText(txtActualTime2Outsole), GetNonEmptyText(txtResultTime2Outsole), GetNonEmptyText(txtActualTime3Outsole), GetNonEmptyText(txtResultTime3Outsole) } },
-                { "Upper", new string[] { GetNonEmptyText(txtActualTime1Upper), GetNonEmptyText(txtResultTime1Upper), GetNonEmptyText(txtActualTime2Upper), GetNonEmptyText(txtResultTime2Outsole), GetNonEmptyText(txtActualTime3Upper), GetNonEmptyText(txtResultTime3Upper) } }
+                { "Outsole", new string[] { GetNonEmptyText(txtActualTime1Outsole), GetNonEmptyText(txtStdTime1Outsole), GetNonEmptyText(txtResultTime1Outsole), GetNonEmptyText(txtActualTime2Outsole), GetNonEmptyText(txtStdTime2Outsole), GetNonEmptyText(txtResultTime2Outsole), GetNonEmptyText(txtActualTime3Outsole), GetNonEmptyText(txtStdTime3Outsole), GetNonEmptyText(txtResultTime3Outsole) } },
+                { "Upper", new string[] { GetNonEmptyText(txtActualTime1Upper), GetNonEmptyText(txtStdTime1Upper), GetNonEmptyText(txtResultTime1Upper), GetNonEmptyText(txtActualTime2Upper), GetNonEmptyText(txtStdTime2Upper), GetNonEmptyText(txtResultTime2Upper), GetNonEmptyText(txtActualTime3Upper), GetNonEmptyText(txtStdTime3Upper), GetNonEmptyText(txtResultTime3Upper) } }
             };
 
                 Dictionary<string, string[]> tempValues = new Dictionary<string, string[]>
             {
-                { "Outsole", new string[] { GetNonEmptyText(txtActualTemp1Outsole), GetNonEmptyText(txtResultTemp1Outsole), GetNonEmptyText(txtActualTemp2Outsole), GetNonEmptyText(txtResultTemp2Outsole), GetNonEmptyText(txtActualTemp3Outsole), GetNonEmptyText(txtResultTemp3Outsole) } },
-                { "Upper", new string[] { GetNonEmptyText(txtActualTemp1Upper), GetNonEmptyText(txtResultTemp1Upper), GetNonEmptyText(txtActualTemp2Upper), GetNonEmptyText(txtResultTemp2Outsole), GetNonEmptyText(txtActualTemp3Upper), GetNonEmptyText(txtResultTemp3Upper) } }
+                { "Outsole", new string[] { GetNonEmptyText(txtActualTemp1Outsole), GetNonEmptyText(txtStdTemp1Outsole), GetNonEmptyText(txtResultTemp1Outsole), GetNonEmptyText(txtActualTemp2Outsole), GetNonEmptyText(txtStdTemp2Outsole), GetNonEmptyText(txtResultTemp2Outsole), GetNonEmptyText(txtActualTemp3Outsole), GetNonEmptyText(txtStdTemp3Outsole), GetNonEmptyText(txtResultTemp3Outsole) } },
+                { "Upper", new string[] { GetNonEmptyText(txtActualTemp1Upper), GetNonEmptyText(txtStdTemp1Upper), GetNonEmptyText(txtResultTemp1Upper), GetNonEmptyText(txtActualTemp2Upper), GetNonEmptyText(txtStdTemp2Upper), GetNonEmptyText(txtResultTemp2Upper), GetNonEmptyText(txtActualTemp3Upper), GetNonEmptyText(txtStdTemp3Upper), GetNonEmptyText(txtResultTemp3Upper) } }
             };
 
                 if (timeValues.Any(v => v.Value.Any(value => !string.IsNullOrEmpty(value))) || tempValues.Any(v => v.Value.Any(value => !string.IsNullOrEmpty(value))))
@@ -892,32 +897,6 @@ namespace BPFC_System
                 return handleParam;
             }
         }
-
-        private List<string> LoadProductionLines(string plantName)
-        {
-            List<string> lines = new List<string>();
-
-            string connectionString = ConfigurationManager.ConnectionStrings["strCon"].ConnectionString;
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand("SELECT LineName FROM ProductionLines WHERE PlantID = (SELECT PlantID FROM Plant WHERE PlantName = @PlantName)", connection))
-            {
-                cmd.Parameters.AddWithValue("@PlantName", plantName);
-                connection.Open();
-
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        string lineName = reader["LineName"].ToString();
-                        lines.Add(lineName);
-                    }
-                }
-            }
-
-            return lines;
-        }
-
 
 
         private void txtActualTemp1Upper_Leave(object sender, EventArgs e)
@@ -1192,31 +1171,43 @@ namespace BPFC_System
 
         private void txtActualTime1Upper_Leave(object sender, EventArgs e)
         {
+            TextBox textBox = (TextBox)sender;
+            textBox.Text = FormatTextBoxValue(textBox.Text);
             CompareTimeValues(txtActualTime1Upper, txtStdTime1Upper, txtResultTime1Upper);
         }
 
         private void txtActualTime2Upper_Leave(object sender, EventArgs e)
         {
+            TextBox textBox = (TextBox)sender;
+            textBox.Text = FormatTextBoxValue(textBox.Text);
             CompareTimeValues(txtActualTime2Upper, txtStdTime2Upper, txtResultTime2Upper);
         }
 
         private void txtActualTime3Upper_Leave(object sender, EventArgs e)
         {
+            TextBox textBox = (TextBox)sender;
+            textBox.Text = FormatTextBoxValue(textBox.Text);
             CompareTimeValues(txtActualTime3Upper, txtStdTime3Upper, txtResultTime3Upper);
         }
 
         private void txtActualTime1Outsole_Leave(object sender, EventArgs e)
         {
+            TextBox textBox = (TextBox)sender;
+            textBox.Text = FormatTextBoxValue(textBox.Text);
             CompareTimeValues(txtActualTime1Outsole, txtStdTime1Outsole, txtResultTime1Outsole);
         }
         
         private void txtActualTime2Outsole_Leave(object sender, EventArgs e)
         {
+            TextBox textBox = (TextBox)sender;
+            textBox.Text = FormatTextBoxValue(textBox.Text);
             CompareTimeValues(txtActualTime2Outsole, txtStdTime2Outsole, txtResultTime2Outsole);
         }
 
         private void txtActualTime3Outsole_Leave(object sender, EventArgs e)
         {
+            TextBox textBox = (TextBox)sender;
+            textBox.Text = FormatTextBoxValue(textBox.Text);
             CompareTimeValues(txtActualTime3Outsole, txtStdTime3Outsole, txtResultTime3Outsole);
         }
 
@@ -1236,6 +1227,54 @@ namespace BPFC_System
         {
             ClearTextBoxes();
             txtArticle.Clear();
+        }
+
+        private void TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            textBox.Text = FormatTextBoxValue(textBox.Text);
+        }
+
+        private string FormatTextBoxValue(string input)
+        {
+            // Bỏ các khoảng trắng
+            string trimmedText = input.Replace(" ", "");
+
+            // Kiểm tra và thêm dấu ':' sau ký tự đầu tiên nếu chưa có
+            if (!trimmedText.Contains(":"))
+            {
+                if (trimmedText.Length > 1)
+                {
+                    trimmedText = trimmedText.Insert(1, ":");
+                }
+                else if (trimmedText.Length == 1)
+                {
+                    trimmedText += ":00";
+                }
+            }
+
+            // Tách phần trước và sau dấu ':'
+            string[] parts = trimmedText.Split(':');
+
+            if (parts.Length == 2)
+            {
+                string secondsPart = parts[1];
+
+                // Kiểm tra nếu phần giây không hợp lệ hoặc rỗng, hiển thị thông báo và trả về giá trị ban đầu
+                if (secondsPart.Length == 0 || !int.TryParse(secondsPart, out int seconds) || seconds < 0 || seconds > 59)
+                {
+                    return input; 
+                }
+                else if (secondsPart.Length == 1)
+                {
+                    secondsPart = "0" + secondsPart; 
+                }
+
+                trimmedText = parts[0] + ":" + secondsPart;
+            }
+
+            // Trả về giá trị đã được định dạng
+            return trimmedText;
         }
 
         private void txtTemp_KeyPress(object sender, KeyPressEventArgs e)

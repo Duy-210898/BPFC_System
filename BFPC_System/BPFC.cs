@@ -27,7 +27,6 @@ namespace BPFC_System
             StartPeriodicTask();
         }
 
-        private int previousItemCount = 0;
         private async void StartPeriodicTask()
         {
             while (true)
@@ -559,23 +558,97 @@ namespace BPFC_System
 
             if (string.IsNullOrWhiteSpace(input))
             {
+                return;
             }
-            else
+
+            // Tách chuỗi input bằng dấu "-"
+            string[] parts = input.Split('-');
+            if (parts.Length == 2)
             {
-                // Sử dụng biểu thức chính quy để kiểm tra định dạng
-                if (System.Text.RegularExpressions.Regex.IsMatch(input, @"^\d{1,2}:\d{2}-\d{1,2}:\d{2}$") ||
-                    System.Text.RegularExpressions.Regex.IsMatch(input, @"^\d{1,2}:\d{1,2}-\d{1,2}:\d{1,2}$"))
+                string startTime = FormatTime(parts[0]);
+                string endTime = FormatTime(parts[1]);
+
+                if (startTime != null && endTime != null)
                 {
-                    // Định dạng hợp lệ, không cần thay đổi gì
+                    textBox.Text = $"{startTime}-{endTime}";
                 }
                 else
                 {
                     // Định dạng không hợp lệ, thông báo cho người dùng
-                    MessageBox.Show("Định dạng không hợp lệ.\nVui lòng nhập lại theo định dạng mm:ss - mm:ss hoặc m:ss - m:ss.", "Invalid format", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                    MessageBox.Show("Định dạng không hợp lệ.\nVui lòng nhập lại theo định dạng m:ss - m:ss.", "Invalid format", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     textBox.Focus();
                 }
             }
+            else
+            {
+                // Định dạng không hợp lệ, thông báo cho người dùng
+                MessageBox.Show("Định dạng không hợp lệ.\nVui lòng nhập lại theo định dạng m:ss - m:ss.", "Invalid format", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBox.Focus();
+            }
+        }
+
+        private string FormatTime(string input)
+        {
+            // Bỏ các khoảng trắng
+            input = input.Trim();
+
+            // Kiểm tra nếu input là số nguyên
+            if (int.TryParse(input, out int time))
+            {
+                if (time < 10)
+                {
+                    return $"{time}:00";
+                }
+                else if (time < 100)
+                {
+                    return $"{time / 10}:{time % 10:D2}";
+                }
+                else if (time < 1000)
+                {
+                    return $"{time / 100}:{time % 100:D2}";
+                }
+                else
+                {
+                    // Định dạng không hợp lệ
+                    return null;
+                }
+            }
+
+            // Kiểm tra nếu input theo định dạng m:ss hoặc m:s
+            if (System.Text.RegularExpressions.Regex.IsMatch(input, @"^\d{1}:\d{1,2}$"))
+            {
+                string[] timeParts = input.Split(':');
+                int minutes = int.Parse(timeParts[0]);
+                int seconds = int.Parse(timeParts[1]);
+
+                // Kiểm tra tính hợp lệ của giây
+                if (seconds < 0 || seconds > 59)
+                {
+                    MessageBox.Show("Số giây không hợp lệ.\nVui lòng nhập lại giá trị giây từ 00 đến 59.", "Invalid seconds", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return null;
+                }
+
+                return $"{minutes}:{seconds:D2}";
+            }
+
+            // Kiểm tra nếu input theo định dạng mm:ss hoặc mm:s
+            if (System.Text.RegularExpressions.Regex.IsMatch(input, @"^\d{2}:\d{1,2}$"))
+            {
+                string[] timeParts = input.Split(':');
+                int minutes = int.Parse(timeParts[0]);
+                int seconds = int.Parse(timeParts[1]);
+
+                // Kiểm tra tính hợp lệ của giây
+                if (seconds < 0 || seconds > 59)
+                {
+                    MessageBox.Show("Số giây không hợp lệ.\nVui lòng nhập lại giá trị giây từ 00 đến 59.", "Invalid seconds", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return null;
+                }
+
+                return $"{minutes}:{seconds:D2}";
+            }
+
+            return null;
         }
 
         public class ArticleData

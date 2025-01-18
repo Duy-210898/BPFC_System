@@ -110,18 +110,34 @@ namespace BFPC_System
 
         private void PopulateSheetWithData(DataTable dataTable)
         {
+            // Sắp xếp DataTable theo FirstLetter và LineNumber
+            DataView dataView = dataTable.DefaultView;
+            dataView.Sort = "FirstLetter ASC, LineNumber ASC";
+            DataTable sortedDataTable = dataView.ToTable();
+
             int offset = 0;
             int startRow = StartRowForHeaders;
 
-            for (int i = 0; i < dataTable.Columns.Count; i++)
+            for (int i = 0; i < sortedDataTable.Columns.Count; i++)
             {
-                string columnName = dataTable.Columns[i].ColumnName;
+                string columnName = sortedDataTable.Columns[i].ColumnName;
 
                 if (!columnName.Equals("LineID") && !columnName.Equals("LineNumber") && !columnName.Equals("FirstLetter"))
                 {
                     AddHeaderRow(startRow, offset, columnName);
-                    AddDataRows(startRow + 1, offset, dataTable.Rows, i);
+                    AddDataRows(startRow + 1, offset, sortedDataTable.Rows, i);
                     offset++;
+                }
+            }
+
+            foreach (DataRow row in sortedDataTable.Rows)
+            {
+                string lineName = row["LineName"].ToString();
+                string lineNumber = row["LineNumber"].ToString();
+
+                if (lineName.Equals("Adiracer", StringComparison.OrdinalIgnoreCase) && lineNumber.Contains("2"))
+                {
+                    Console.WriteLine($"Found matching row: LineName = {lineName}, LineNumber = {lineNumber}");
                 }
             }
         }

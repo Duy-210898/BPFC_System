@@ -94,7 +94,7 @@
             this.dtpReportDate.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dtpReportDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dtpReportDate.Location = new System.Drawing.Point(109, 3);
-            this.dtpReportDate.MaxDate = new System.DateTime(2023, 12, 26, 0, 0, 0, 0);
+            this.dtpReportDate.MaxDate = new System.DateTime(2027, 1, 1, 0, 0, 0, 0);
             this.dtpReportDate.Name = "dtpReportDate";
             this.dtpReportDate.Size = new System.Drawing.Size(237, 29);
             this.dtpReportDate.TabIndex = 9;
