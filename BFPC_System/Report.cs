@@ -361,7 +361,6 @@ namespace BFPC_System
                     }
 
                     excelExporter.SaveWorkbookWithUniqueName(filePath);
-                    MessageBox.Show(this, "Dữ liệu đã được xuất thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
                 dgvReport.DataSource = originalDataSource;
@@ -1034,6 +1033,8 @@ namespace BFPC_System
             // Tạo DataTable mới cho xưởng đã chọn
             DataTable plantDataTable = new DataTable();
             plantDataTable.Columns.Add("LineID", typeof(int));
+            plantDataTable.Columns.Add("LineNumber", typeof(int));
+            plantDataTable.Columns.Add("FirstLetter", typeof(char));
             plantDataTable.Columns.Add("LineName", typeof(object));
             plantDataTable.Columns.Add("Model", typeof(object));
             plantDataTable.Columns.Add("ArticleName", typeof(object));
